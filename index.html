@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Quantum Computing Workbook</title>
+<script>try{var t=localStorage.getItem("qcw-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -1547,7 +1548,8 @@ function colors(){
   var cs=getComputedStyle(document.documentElement);
   return {ink:cs.getPropertyValue("--sphere-ink").trim(), zero:cs.getPropertyValue("--zero").trim(),
           one:cs.getPropertyValue("--one").trim(), phase:cs.getPropertyValue("--phase").trim(),
-          muted:cs.getPropertyValue("--muted").trim()};
+          muted:cs.getPropertyValue("--muted").trim(), ok:cs.getPropertyValue("--ok").trim(),
+          bad:cs.getPropertyValue("--bad").trim()};
 }
 function rgb(h){h=h.replace("#","");if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];var n=parseInt(h,16);return [(n>>16)&255,(n>>8)&255,n&255];}
 function alpha(h,a){var c=rgb(h);return "rgba("+c[0]+","+c[1]+","+c[2]+","+a+")";}
@@ -1674,7 +1676,7 @@ Bloch.prototype.draw=function(){
 
   if(len>0.02){
     var u=[this.v[0]/len,this.v[1]/len,this.v[2]/len];
-    var th=Math.acos(Math.max(-1,Math.min(1,u[2]))), ph=Math.atan2(u[1],u[0]);
+    var th=Math.acos(Math.max(-1,Math.min(1,u[2]))), ph=Math.atan2(u[1],u[0]); if(ph<0)ph+=TAU;
     var ar=0.3, sub=function(f,n,col,label){
       ctx.strokeStyle=col; ctx.lineWidth=1.3; ctx.setLineDash([]);
       ctx.beginPath();
@@ -1687,7 +1689,7 @@ Bloch.prototype.draw=function(){
     if(th>0.04){
       sub(function(s){var a=th*s;return [ar*Math.sin(a)*Math.cos(ph),ar*Math.sin(a)*Math.sin(ph),ar*Math.cos(a)];},24,C.phase,"θ");
     }
-    if(Math.sin(th)>0.15&&Math.abs(ph)>0.04){
+    if(Math.sin(th)>0.15&&ph>0.04&&ph<TAU-0.04){
       var ar2=ar*0.72;
       sub(function(s){var a=ph*s;return [ar2*Math.cos(a),ar2*Math.sin(a),0];},32,C.ok,"φ");
     }
@@ -1750,7 +1752,7 @@ var expSphere=new Bloch($("#cvExplore"));
 var gateSphere=new Bloch($("#cvGate"));
 (function(){
   var state={a:cx(1,0),b:cx(0,0)};
-  var history=[], busy=false, usedX=false, hitMinus=false;
+  var history=[], busy=false, usedX=false, hitMinus=false, queue=[];
   var tape=$("#tape");
   var tasks=$$("#tasks li");
 
@@ -1762,7 +1764,7 @@ var gateSphere=new Bloch($("#cvGate"));
       var near=Math.abs(v[0]-tg[0])<0.02&&Math.abs(v[1]-tg[1])<0.02&&Math.abs(v[2]-tg[2])<0.02;
       if(!near)return;
       if(i===0&&history.length!==1)return;
-      if(i===1&&history.length>2===false&&history.length!==2)return;
+      if(i===1&&history.length!==2)return;
       if(i===2&&usedX)return;
       if(i===3)return;
       li.classList.add("solved"); li.querySelector(".mk").textContent="";
@@ -1792,7 +1794,7 @@ var gateSphere=new Bloch($("#cvGate"));
     tape.innerHTML='<span class="e">|0⟩ </span>'+history.map(function(g){return '<span class="g">'+g+'</span>';}).join("");
   }
   function run(n,angle,label){
-    if(busy)return;
+    if(busy){if(queue.length<6)queue.push([n,angle,label]);return;}
     if(label==="X")usedX=true;
     history.push(label); if(history.length>14)history.shift();
     renderTape();
@@ -1801,6 +1803,7 @@ var gateSphere=new Bloch($("#cvGate"));
       state=applyM(rotMatrix(n,angle),start);
       gateSphere.setVec(blochOf(state),true);
       readout(); busy=false;
+      if(queue.length){var q=queue.shift();run(q[0],q[1],q[2]);}
     }
     if(reduceMotion){finish();return;}
     busy=true;
@@ -1826,7 +1829,7 @@ var gateSphere=new Bloch($("#cvGate"));
   });
   $("#rotSl").addEventListener("input",function(){$("#rotOut").textContent=this.value+"°";});
   $("#gateReset").addEventListener("click",function(){
-    state={a:cx(1,0),b:cx(0,0)}; history=[]; usedX=false; hitMinus=false;
+    state={a:cx(1,0),b:cx(0,0)}; history=[]; usedX=false; hitMinus=false; queue=[];
     gateSphere.clearTrail(); renderTape(); gateSphere.setVec([0,0,1]); readout();
   });
   gateSphere.setVec([0,0,1]); readout();
@@ -1862,7 +1865,7 @@ var gateSphere=new Bloch($("#cvGate"));
     if(log.length>400)log=log.slice(-400);
     drawCounts();
   }
-  sl.addEventListener("input",drawProbs);
+  sl.addEventListener("input",function(){drawProbs(); if(c0+c1){c0=0;c1=0;log=[];drawCounts();}});
   $("#shot1").addEventListener("click",function(){shoot(1);});
   $("#shot20").addEventListener("click",function(){shoot(20);});
   $("#shot500").addEventListener("click",function(){shoot(500);});
@@ -2149,8 +2152,8 @@ function vec2(x,y){return "["+f2(x)+", "+f2(y)+"]";}
     $("#cxA").textContent=f2(a); $("#cxB").textContent=f2(b);
     $("#cxMod").textContent=f2(m); $("#cxMod2").textContent=f2(m*m);
     $("#cxConj").textContent=cplx(a,-b);
-    var d=Math.atan2(b,a)*180/Math.PI; if(d<0)d+=360;
-    $("#cxTh").textContent=(m<0.05?"·":Math.round(d)+"°");
+    var d=Math.atan2(b,a)*180/Math.PI;
+    $("#cxTh").textContent=(m<0.05?"·":(d<0?"−":"")+Math.round(Math.abs(d))+"°");
     $("#cxNote").textContent="z·z* = a² + b² = "+f2(a*a)+" + "+f2(b*b)+" = "+f2(m*m)+", the same as |z|².";
     obj.draw();
   }
@@ -2309,7 +2312,7 @@ function vec2(x,y){return "["+f2(x)+", "+f2(y)+"]";}
     bs.forEach(function(btn){btn.addEventListener("click",function(){
       bs.forEach(function(o){o.setAttribute("aria-pressed","false");});
       btn.setAttribute("aria-pressed","true");
-      var v=btn.dataset.v.split(",").map(Number); set(v); update();
+      var v=btn.dataset.v.split(",").map(function(x){x=+x;return Math.abs(Math.abs(x)-0.707)<1e-3?(x<0?-SQ:SQ):x;}); set(v); update();
     });});
   }
   wire("tpAbtns",function(v){a=v;}); wire("tpBbtns",function(v){b=v;});
@@ -2413,9 +2416,11 @@ if("IntersectionObserver" in window){
 $("#themeBtn").addEventListener("click",function(){
   var cur=document.documentElement.getAttribute("data-theme");
   var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
-  document.documentElement.setAttribute("data-theme",dark?"light":"dark");
+  var next=dark?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next); store("qcw-theme",next);
   spheres.forEach(function(s){s.draw();});
 });
+(function(){var t=load("qcw-theme"); if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t); spheres.forEach(function(s){s.draw();});}})();
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){
   spheres.forEach(function(s){s.draw();});
 });
