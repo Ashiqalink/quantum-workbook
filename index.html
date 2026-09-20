@@ -226,7 +226,7 @@ button.b:disabled{opacity:.5;cursor:default}
 /* notebook */
 .nb{margin:0 0 18px;border:1px solid var(--rule);background:var(--panel)}
 .nbhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid var(--rule);font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
-.cell{display:grid;grid-template-columns:82px minmax(0,1fr);border-bottom:1px solid var(--rule)}
+.cell{position:relative;display:grid;grid-template-columns:82px minmax(0,1fr);border-bottom:1px solid var(--rule)}
 .cell:last-child{border-bottom:0}
 .cell .pr{font-family:"IBM Plex Mono",monospace;font-size:13px;padding:13px 10px 0 10px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .cell .pr.in{color:var(--link)}
@@ -245,8 +245,13 @@ button.b:disabled{opacity:.5;cursor:default}
 .src .fn{color:var(--ink)}
 @media (max-width:600px){
   .cell,.cell .res{grid-template-columns:minmax(0,1fr)}
-  .cell .pr{text-align:left;padding:10px 14px 0}
-  .cell .src{border-left:0;border-top:1px solid var(--rule)}
+  .cell .pr{text-align:left;padding:0 14px;display:flex;align-items:center;min-height:40px}
+  .cell .src{border-left:0;border-top:1px solid var(--rule);position:static}
+  .cell .src pre{padding-right:14px}
+  .cell .copy{top:5px;right:10px}
+}
+@media (max-width:600px) and (pointer:coarse){
+  .cell .pr{min-height:54px}
 }
 
 /* quiz */
