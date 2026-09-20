@@ -758,7 +758,7 @@ e^{iα} · e^{iβ} = e^{i(α+β)}           multiplying adds angles</div>
               <div class="two">
                 <div>
                   <div class="sphere-wrap"><canvas class="bloch" id="cvExplore"></canvas></div>
-                  <ul class="legend"><li><span class="sw grad"></span>state arrow, |0⟩ to |1⟩</li><li><span class="sw dash"></span>drop to the equator</li></ul>
+                  <ul class="legend"><li><span class="sw grad"></span>state arrow, |0⟩ to |1⟩</li><li><span class="sw phase"></span>θ, from |0⟩</li><li><span class="sw ok"></span>φ, from |+⟩</li><li><span class="sw dash"></span>drop to the equator</li></ul>
                 </div>
                 <div>
                   <div class="rowline"><label for="thSl">θ</label><input type="range" id="thSl" min="0" max="180" value="0" step="1"><output id="thOut">0°</output></div>
@@ -851,7 +851,7 @@ X = [0 1]    Y = [0 −i]    Z = [1  0]
               <div class="two">
                 <div>
                   <div class="sphere-wrap"><canvas class="bloch" id="cvGate"></canvas></div>
-                  <ul class="legend"><li><span class="sw grad"></span>state arrow, |0⟩ to |1⟩</li><li><span class="sw phase"></span>path of the last gate</li><li><span class="sw dash"></span>drop to the equator</li></ul>
+                  <ul class="legend"><li><span class="sw grad"></span>state arrow, |0⟩ to |1⟩</li><li><span class="sw phase"></span>path of the last gate, θ mark</li><li><span class="sw ok"></span>φ mark</li><li><span class="sw dash"></span>drop to the equator</li></ul>
                 </div>
                 <div>
                   <p class="lbl">named gates</p>
@@ -1651,6 +1651,24 @@ Bloch.prototype.draw=function(){
   ctx.setLineDash([]);
 
   if(len>0.02){
+    var u=[this.v[0]/len,this.v[1]/len,this.v[2]/len];
+    var th=Math.acos(Math.max(-1,Math.min(1,u[2]))), ph=Math.atan2(u[1],u[0]);
+    var ar=0.3, sub=function(f,n,col,label){
+      ctx.strokeStyle=col; ctx.lineWidth=1.3; ctx.setLineDash([]);
+      ctx.beginPath();
+      for(var i=0;i<=n;i++){var q=self.proj(f(i/n)); if(i===0)ctx.moveTo(q.x,q.y); else ctx.lineTo(q.x,q.y);}
+      ctx.stroke();
+      var m=self.proj(f(0.5)), oo=self.proj([0,0,0]), dx=m.x-oo.x, dy=m.y-oo.y, dl=Math.hypot(dx,dy)||1;
+      ctx.font="500 12px 'IBM Plex Mono', monospace"; ctx.fillStyle=col; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText(label,m.x+dx/dl*11,m.y+dy/dl*11);
+    };
+    if(th>0.04){
+      sub(function(s){var a=th*s;return [ar*Math.sin(a)*Math.cos(ph),ar*Math.sin(a)*Math.sin(ph),ar*Math.cos(a)];},24,C.phase,"θ");
+    }
+    if(Math.sin(th)>0.15&&Math.abs(ph)>0.04){
+      var ar2=ar*0.72;
+      sub(function(s){var a=ph*s;return [ar2*Math.cos(a),ar2*Math.sin(a),0];},32,C.ok,"φ");
+    }
     ctx.strokeStyle=col; ctx.lineWidth=2.6; ctx.lineCap="round";
     ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(tip.x,tip.y);ctx.stroke();
     var ang=Math.atan2(tip.y-o.y,tip.x-o.x), hs=this.compact?7:8.5;
@@ -1999,8 +2017,8 @@ var bellSphere=new Bloch($("#cvBell"),{compact:true});
       ctx.fillText("i",ox+5,oy-R-16);
       ctx.textAlign="right"; ctx.fillText("−1",ox-R-4,oy+4);
       ctx.fillText("−i",ox-5,oy+R+4);
-      // angle arc
-      ctx.beginPath();ctx.arc(ox,oy,R*0.28,0,-th,true);ctx.strokeStyle=C.phase;ctx.lineWidth=1.4;ctx.stroke();
+      // angle mark
+      angleMark(ctx,ox,oy,18,0,th,C.phase,"θ");
       // z^2 (light)
       var x2=ox+R*Math.cos(2*th), y2=oy-R*Math.sin(2*th);
       ctx.setLineDash([2,4]);ctx.strokeStyle=alpha(C.one,0.6);ctx.lineWidth=1.2;
@@ -2062,6 +2080,14 @@ function arrow(ctx,x0,y0,x1,y1,col,lw,dash){
   ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1-hs*ux+hs*0.5*uy,y1-hs*uy-hs*0.5*ux);ctx.lineTo(x1-hs*ux-hs*0.5*uy,y1-hs*uy+hs*0.5*ux);ctx.closePath();ctx.fill();
   ctx.restore();
 }
+function angleMark(ctx,ox,oy,r,a0,a1,col,label){
+  var d=a1-a0; if(Math.abs(d)<0.03)return;
+  ctx.save(); ctx.lineWidth=1.4; ctx.strokeStyle=col;
+  ctx.beginPath(); ctx.arc(ox,oy,r,-a0,-a1,d>0); ctx.stroke();
+  var m=a0+d/2, lx=ox+(r+11)*Math.cos(m), ly=oy-(r+11)*Math.sin(m);
+  ctx.font="500 12px 'IBM Plex Mono', monospace"; ctx.fillStyle=col; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText(label,lx,ly); ctx.restore();
+}
 function tag(ctx,x,y,s,col){ctx.font="500 12px 'IBM Plex Mono', monospace";ctx.fillStyle=col;ctx.textAlign="left";ctx.textBaseline="bottom";ctx.fillText(s,x+6,y-6);}
 var f2=function(x){return (Math.abs(x)<5e-3?0:x).toFixed(2);};
 function cplx(a,b){return f2(a)+(b<0?" − ":" + ")+f2(Math.abs(b))+"i";}
@@ -2087,7 +2113,7 @@ function vec2(x,y){return "["+f2(x)+", "+f2(y)+"]";}
     if(Math.abs(z[1])>0.25){ctx.textAlign=z[0]>=0?"left":"right"; ctx.fillText("a",x+(z[0]>=0?6:-6),(y+oy)/2);}
     if(Math.abs(z[0])>0.25){ctx.textAlign="center"; ctx.textBaseline=z[1]>=0?"bottom":"top"; ctx.fillText("b",(x+ox)/2,y+(z[1]>=0?-5:5));}
     // angle
-    if(Math.hypot(z[0],z[1])>0.05){ctx.beginPath();ctx.arc(ox,oy,R*0.6,0,-th,th>0);ctx.strokeStyle=C.phase;ctx.lineWidth=1.4;ctx.stroke();}
+    if(Math.hypot(z[0],z[1])>0.05)angleMark(ctx,ox,oy,18,0,th,C.phase,"θ");
     // conjugate
     arrow(ctx,ox,oy,x,yc,alpha(C.one,0.45),1.6,[3,4]); tag(ctx,x,yc,"z*",alpha(C.one,0.8));
     ctx.beginPath();ctx.arc(x,yc,4,0,TAU);ctx.fillStyle=alpha(C.one,0.45);ctx.fill();
@@ -2119,14 +2145,13 @@ function vec2(x,y){return "["+f2(x)+", "+f2(y)+"]";}
 (function(){
   var R1=$("#cpR1"),T1=$("#cpT1"),R2=$("#cpR2"),T2=$("#cpT2");
   var obj=flatCanvas($("#cvProd"),function(ctx,w,h,C){
-    var R=Math.min(w,h)*0.22, ox=w/2, oy=h/2;
+    var R=Math.min(w,h)*0.3, ox=w/2, oy=h/2;
     var r1=+R1.value/100, t1=rad(+T1.value), r2=+R2.value/100, t2=rad(+T2.value);
     planeAxes(ctx,ox,oy,R,C,2.2);
     function pt(r,t){return [ox+R*r*Math.cos(t), oy-R*r*Math.sin(t)];}
-    ctx.lineWidth=1.4;
-    ctx.beginPath();ctx.arc(ox,oy,R*0.34,0,-t1,true);ctx.strokeStyle=C.zero;ctx.stroke();
-    ctx.beginPath();ctx.arc(ox,oy,R*0.5,0,-t2,true);ctx.strokeStyle=C.phase;ctx.stroke();
-    ctx.beginPath();ctx.arc(ox,oy,R*0.66,0,-((t1+t2)%TAU),true);ctx.strokeStyle=alpha(C.one,0.8);ctx.stroke();
+    angleMark(ctx,ox,oy,13,0,t1,C.zero,"θ");
+    angleMark(ctx,ox,oy,22,0,t2,C.phase,"φ");
+    angleMark(ctx,ox,oy,31,0,(t1+t2)%TAU,alpha(C.one,0.8),"θ+φ");
     var z=pt(r1,t1), wv=pt(r2,t2), p=pt(r1*r2,t1+t2);
     arrow(ctx,ox,oy,z[0],z[1],C.zero,2.2); tag(ctx,z[0],z[1],"z",C.zero);
     arrow(ctx,ox,oy,wv[0],wv[1],C.phase,2.2); tag(ctx,wv[0],wv[1],"w",C.phase);
