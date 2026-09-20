@@ -1,0 +1,2371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quantum Computing Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#FAFAF8;
+  --panel:#F2F2EE;
+  --ink:#1A1B19;
+  --ink-2:#3A3C38;
+  --muted:#5E6059;
+  --rule:#DEDED7;
+  --rule-2:#C4C4BA;
+  --link:#2C5F52;
+  --zero:#274E77;
+  --one:#A03A2B;
+  --phase:#8A6516;
+  --sphere-ink:#1A1B19;
+  --ok:#2C5F52;
+  --bad:#A03A2B;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#141513;
+    --panel:#1D1E1B;
+    --ink:#E7E7E0;
+    --ink-2:#C6C7BE;
+    --muted:#8E9088;
+    --rule:#2C2E29;
+    --rule-2:#43453E;
+    --link:#79B9A4;
+    --zero:#84AEDD;
+    --one:#DE8B76;
+    --phase:#D5B360;
+    --sphere-ink:#E7E7E0;
+    --ok:#79B9A4;
+    --bad:#DE8B76;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141513;
+  --panel:#1D1E1B;
+  --ink:#E7E7E0;
+  --ink-2:#C6C7BE;
+  --muted:#8E9088;
+  --rule:#2C2E29;
+  --rule-2:#43453E;
+  --link:#79B9A4;
+  --zero:#84AEDD;
+  --one:#DE8B76;
+  --phase:#D5B360;
+  --sphere-ink:#E7E7E0;
+  --ok:#79B9A4;
+  --bad:#DE8B76;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:Spectral,Georgia,"Times New Roman",serif;font-size:18.5px;line-height:1.6}
+.page{display:grid;grid-template-columns:270px minmax(0,1fr)}
+
+/* contents rail */
+.rail{position:sticky;top:0;height:100svh;overflow-y:auto;border-right:1px solid var(--rule);padding:26px 18px 30px}
+.rail .who{font-size:17px;font-weight:600;line-height:1.3;margin:0 0 3px}
+.rail .sub{font-size:14px;color:var(--muted);margin:0 0 20px;font-family:"IBM Plex Mono",monospace}
+.rail ol{list-style:none;margin:0;padding:0}
+.rail li{margin:0}
+.rail a{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;padding:3px 4px;color:var(--ink-2);text-decoration:none;font-size:15px;line-height:1.35;border-radius:2px}
+.rail a:hover{color:var(--ink);background:var(--panel)}
+.rail a .n{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);padding-top:3px}
+.rail a.here{color:var(--ink);background:var(--panel)}
+.rail a.done .n::after{content:"\2713";color:var(--ok)}
+.rail a.done .n span{display:none}
+.railfoot{margin-top:22px;padding-top:14px;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.mini{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);background:none;border:1px solid var(--rule-2);padding:3px 8px;border-radius:2px;cursor:pointer}
+
+main{padding:0 40px 90px}
+article{max-width:940px;margin:0 auto}
+.prose{max-width:64ch}
+
+header.top{padding:64px 0 34px;border-bottom:1px solid var(--rule)}
+h1{font-weight:300;font-size:clamp(36px,4.8vw,52px);line-height:1.12;margin:0 0 14px;letter-spacing:-.01em}
+.standfirst{font-size:20px;color:var(--ink-2);max-width:60ch;margin:0 0 22px}
+.howto{display:grid;grid-template-columns:1.1fr 1.5fr .9fr;gap:0;border-top:1px solid var(--rule);max-width:none}
+.howto div{padding:14px 18px 14px 0;border-right:1px solid var(--rule)}
+.howto div:last-child{border-right:0}
+.howto h4{margin:0 0 4px;font-size:14.5px;font-weight:600;font-family:"IBM Plex Mono",monospace}
+.howto p{margin:0;font-size:16px;color:var(--muted)}
+
+section.lesson{padding:46px 0 10px;border-bottom:1px solid var(--rule);scroll-margin-top:10px}
+.lhead{display:grid;grid-template-columns:64px minmax(0,1fr);gap:0;margin-bottom:20px}
+.lhead .lnum{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted);padding-top:9px}
+h2{font-weight:400;font-size:clamp(27px,3vw,34px);line-height:1.2;margin:0;letter-spacing:-.005em;max-width:26ch}
+.lhead .goal{grid-column:2;font-size:16.5px;color:var(--muted);margin:6px 0 0;max-width:56ch;font-style:italic}
+.lbody{display:grid;grid-template-columns:64px minmax(0,1fr);gap:0}
+.lbody > .col{grid-column:2}
+
+h3{font-size:18.5px;font-weight:600;margin:26px 0 8px}
+p{margin:0 0 14px;max-width:64ch}
+.small{font-size:16.5px;color:var(--muted)}
+strong{font-weight:600}
+code,.k{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--panel);padding:1px 4px;border-radius:2px}
+a{color:var(--link)}
+
+ul,ol.plain{max-width:64ch;padding-left:20px;margin:0 0 14px}
+li{margin-bottom:6px}
+
+.eq{font-family:"IBM Plex Mono",monospace;font-size:15.5px;line-height:1.9;background:var(--panel);border-left:2px solid var(--rule-2);padding:12px 16px;margin:0 0 16px;overflow-x:auto;white-space:pre;max-width:none}
+.eq .cm{color:var(--muted)}
+.eq .kw{color:var(--link)}
+
+.def{border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);padding:12px 0 14px;margin:0 0 18px;max-width:64ch}
+.def h4{margin:0 0 5px;font-size:14.5px;font-family:"IBM Plex Mono",monospace;font-weight:500;color:var(--muted)}
+.def p:last-child{margin-bottom:0}
+
+.worked{border:1px solid var(--rule);background:var(--panel);padding:16px 18px;margin:0 0 18px;max-width:none}
+.worked h4{margin:0 0 10px;font-size:14.5px;font-family:"IBM Plex Mono",monospace;font-weight:500;color:var(--muted)}
+.worked ol{padding-left:18px;margin:0;max-width:60ch}
+.worked li{margin-bottom:9px;font-size:17px}
+.worked li:last-child{margin-bottom:0}
+.worked li.hid{display:none}
+.worked .next{margin-top:12px}
+.worked .eq{background:transparent;border-left:0;padding:6px 0;margin:6px 0}
+
+table{border-collapse:collapse;width:100%;font-size:16.5px;margin:0 0 18px}
+th,td{text-align:left;padding:8px 12px 8px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{font-size:14px;color:var(--muted);font-weight:600;font-family:"IBM Plex Mono",monospace}
+td:first-child,th:first-child{padding-left:0}
+td.m{font-family:"IBM Plex Mono",monospace;font-size:15px;white-space:nowrap}
+
+/* reveal blocks */
+details{border-top:1px solid var(--rule);margin:0 0 2px;max-width:64ch}
+details:last-of-type{border-bottom:1px solid var(--rule);margin-bottom:18px}
+summary{cursor:pointer;list-style:none;padding:9px 0;font-size:17px;display:flex;gap:9px;align-items:baseline}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";font-family:"IBM Plex Mono",monospace;color:var(--link);font-size:16px;width:14px;flex:none}
+details[open] summary::before{content:"\2013"}
+details[open] summary{font-weight:600}
+details .inner{padding:0 0 14px 23px;font-size:17px;color:var(--ink-2);max-width:60ch}
+details .inner p:last-child{margin-bottom:0}
+
+.exercises{margin:22px 0 4px}
+.exercises h3{margin-top:0}
+.exercises ol{list-style:none;padding:0;counter-reset:ex}
+.exercises > ol > li{counter-increment:ex;display:grid;grid-template-columns:30px minmax(0,1fr);gap:0;margin-bottom:4px}
+.exercises > ol > li::before{content:counter(ex) ".";font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted);padding-top:11px}
+.exercises .q{font-size:17px}
+.exercises details{border-top:0}
+.exercises details:last-of-type{border-bottom:0}
+.exercises summary{padding:4px 0 10px;font-size:16px;color:var(--muted)}
+.exercises details[open] summary{font-weight:400}
+.exercises .inner{padding-bottom:12px;border-bottom:1px solid var(--rule)}
+
+/* figures / instruments */
+figure{margin:0 0 20px;border:1px solid var(--rule);background:var(--panel)}
+figure .fbody{padding:16px}
+figcaption{border-top:1px solid var(--rule);padding:9px 16px;font-size:15px;color:var(--muted)}
+.two{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:900px){.two{grid-template-columns:minmax(0,1fr)}}
+.sphere-wrap{position:relative;width:100%;max-width:300px;margin:0 auto;aspect-ratio:1/1}
+canvas.bloch{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas.bloch:active{cursor:grabbing}
+
+.rowline{display:grid;grid-template-columns:auto minmax(0,1fr) 64px;align-items:center;gap:10px;margin-bottom:10px}
+.rowline label{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted)}
+.rowline output{font-family:"IBM Plex Mono",monospace;font-size:15px;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--link);height:20px}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+button.b{font-family:"IBM Plex Mono",monospace;font-size:15px;padding:6px 12px;border:1px solid var(--rule-2);background:var(--paper);color:var(--ink);border-radius:2px;cursor:pointer}
+button.b:hover,.mini:hover{border-color:var(--ink);color:var(--ink)}
+button.b:active,.mini:active{background:var(--panel)}
+button.b[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button.b:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.lbl{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--muted);margin:0 0 6px}
+
+.vals{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));border-top:1px solid var(--rule);font-family:"IBM Plex Mono",monospace}
+.vals div{padding:8px 12px 8px 0;border-right:1px solid var(--rule)}
+.vals div:last-child{border-right:0}
+.vals .t{font-size:13px;color:var(--muted)}
+.vals .v{font-size:16px;font-variant-numeric:tabular-nums}
+.vals.wide{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.legend{list-style:none;margin:10px auto 0;padding:0;max-width:340px;display:flex;flex-wrap:wrap;gap:4px 14px;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-2)}
+.legend li{display:flex;align-items:center;gap:7px}
+.legend .sw{display:inline-block;width:16px;height:3px;border-radius:2px;background:var(--ink);flex:none}
+.legend .sw.zero{background:var(--zero)} .legend .sw.one{background:var(--one)} .legend .sw.phase{background:var(--phase)} .legend .sw.ok{background:var(--ok)}
+.legend .sw.faint{opacity:.4}
+.legend .sw.dash{height:0;background:none;border-top:2px dashed var(--ink);opacity:.6}
+.legend .sw.grad{width:28px;background:linear-gradient(90deg,var(--zero),var(--one))}
+.legend .sw.ring{width:10px;height:10px;border-radius:50%;background:none;border:1.5px solid var(--one)}
+
+.bar{display:grid;grid-template-columns:52px minmax(0,1fr) 74px;align-items:center;gap:10px;margin-bottom:6px;font-family:"IBM Plex Mono",monospace;font-size:15px}
+.track{height:14px;background:var(--paper);border:1px solid var(--rule)}
+.fill{height:100%;width:0;background:var(--zero);transition:width .25s linear}
+.fill.o{background:var(--one)}
+.bar .n{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+
+.tape{font-family:"IBM Plex Mono",monospace;font-size:15px;border:1px solid var(--rule);background:var(--paper);padding:7px 10px;min-height:32px;word-break:break-all}
+.tape .g{border:1px solid var(--rule-2);padding:0 5px;margin-right:3px;display:inline-block}
+.tape .e{color:var(--muted)}
+.circuit{font-family:"IBM Plex Mono",monospace;font-size:15px;line-height:1.7;white-space:pre;overflow-x:auto;background:var(--paper);border:1px solid var(--rule);padding:12px}
+
+.tasks{list-style:none;padding:0;margin:0}
+.tasks li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;font-size:16.5px;margin-bottom:9px;color:var(--ink-2)}
+.tasks li .mk{font-family:"IBM Plex Mono",monospace;color:var(--muted);font-size:15px}
+.tasks li.solved .mk{color:var(--ok)}
+.tasks li.solved{color:var(--muted);text-decoration:line-through}
+
+/* notebook */
+.nb{margin:0 0 18px;border:1px solid var(--rule);background:var(--panel)}
+.nbhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid var(--rule);font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+.cell{display:grid;grid-template-columns:82px minmax(0,1fr);border-bottom:1px solid var(--rule)}
+.cell:last-child{border-bottom:0}
+.cell .pr{font-family:"IBM Plex Mono",monospace;font-size:13px;padding:13px 10px 0 10px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cell .pr.in{color:var(--link)}
+.cell .pr.out{color:var(--one)}
+.cell pre{margin:0;padding:12px 14px;font-family:"IBM Plex Mono",monospace;font-size:14.5px;line-height:1.55;overflow-x:auto;white-space:pre;tab-size:4}
+.cell .src{position:relative;background:var(--paper);border-left:1px solid var(--rule)}
+.cell .src pre{padding-right:70px}
+.cell .copy{position:absolute;top:8px;right:8px}
+.cell .res{grid-column:1/-1;display:grid;grid-template-columns:82px minmax(0,1fr);border-top:1px dashed var(--rule)}
+.cell .res pre{color:var(--ink-2)}
+.cell .res pre.note{white-space:normal;color:var(--muted);font-family:Spectral,Georgia,serif;font-size:16px;font-style:italic}
+.src .kw{color:var(--link)}
+.src .cm{color:var(--muted)}
+.src .st{color:var(--phase)}
+.src .nu{color:var(--zero)}
+.src .fn{color:var(--ink)}
+@media (max-width:600px){
+  .cell,.cell .res{grid-template-columns:minmax(0,1fr)}
+  .cell .pr{text-align:left;padding:10px 14px 0}
+  .cell .src{border-left:0;border-top:1px solid var(--rule)}
+}
+
+/* quiz */
+.quiz{counter-reset:qq}
+.q-item{border-top:1px solid var(--rule);padding:16px 0}
+.q-item:last-child{border-bottom:1px solid var(--rule)}
+.q-item .qt{font-size:17.5px;margin:0 0 10px;max-width:62ch}
+.q-item .opts{display:flex;flex-direction:column;gap:5px;max-width:62ch}
+.q-item label{display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;font-size:16.5px;color:var(--ink-2);cursor:pointer;padding:3px 0}
+.q-item input{margin:0;accent-color:var(--link);align-self:start;margin-top:5px}
+.q-item .fb{margin:10px 0 0;font-size:16px;display:none;max-width:62ch;padding-left:12px;border-left:2px solid var(--rule-2)}
+.q-item.checked .fb{display:block}
+.q-item.right .fb{border-left-color:var(--ok)}
+.q-item.wrong .fb{border-left-color:var(--bad)}
+.score{font-family:"IBM Plex Mono",monospace;font-size:16px;margin-top:14px}
+
+.doneline{display:flex;align-items:center;gap:10px;margin:22px 0 6px;font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted)}
+.doneline input{accent-color:var(--ok);width:15px;height:15px}
+
+@media (pointer:coarse){
+  button.b,.mini{min-height:44px;padding:10px 14px}
+  input[type=range]{height:44px}
+  .doneline{min-height:44px}
+  .doneline input{width:20px;height:20px}
+  summary{padding:12px 0}
+}
+@media (max-width:1000px){
+  .page{grid-template-columns:minmax(0,1fr)}
+  .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule);padding:18px}
+  .rail ol{columns:2;column-gap:18px}
+  main{padding:0 20px 70px}
+  .lhead,.lbody{grid-template-columns:minmax(0,1fr)}
+  .lhead .lnum{padding-top:0;margin-bottom:4px}
+  .lhead .goal,.lbody > .col{grid-column:1}
+  .howto{grid-template-columns:minmax(0,1fr)}
+  .howto div{border-right:0;border-bottom:1px solid var(--rule)}
+}
+@media (max-width:600px){
+  td.m{white-space:normal}
+  main{padding:0 16px 60px}
+  header.top{padding:40px 0 26px}
+  .rail ol{columns:1}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <nav class="rail">
+    <p class="who">Quantum Computing</p>
+    <p class="sub">a workbook</p>
+    <ol id="toc"></ol>
+    <div class="railfoot">
+      <button class="mini" type="button" id="themeBtn">light / dark</button>
+      <button class="mini" type="button" id="resetBtn">reset progress</button>
+    </div>
+  </nav>
+
+  <main>
+    <article>
+      <header class="top">
+        <h1>A workbook for learning quantum computing</h1>
+        <p class="standfirst">Fifteen short lessons, numbered from zero. Each one gives you the idea, a worked example, something to operate, and questions to answer before you move on. Work through it in order; the later lessons assume the earlier ones.</p>
+        <div class="howto">
+          <div>
+            <h4>What you need first</h4>
+            <p>Arithmetic. Lesson 00 covers the complex numbers, vectors, and matrices the rest uses. Skip it if you have them. Nothing from physics.</p>
+          </div>
+          <div>
+            <h4>How to use it</h4>
+            <p>Answer each question before opening the answer. Guessing and checking is where the learning happens.</p>
+          </div>
+          <div>
+            <h4>Roughly</h4>
+            <p>Three hours to read. Longer if you do the exercises properly, which you should.</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- ================= 0 ================= -->
+      <section class="lesson" id="l0" data-title="The mathematics">
+        <div class="lhead">
+          <div class="lnum">00</div>
+          <h2>The mathematics, in one sitting</h2>
+          <p class="goal">By the end: you can multiply two complex numbers, take an inner product, and check a matrix is unitary. Skip this if you already can.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>Three tools carry the whole subject: complex numbers, vectors, and matrices. None of them is deep. Each has one or two facts that get used constantly, and those facts are all this lesson covers.</p>
+
+          <h3>Complex numbers</h3>
+          <p>Introduce one new number, <code>i</code>, with <code>i² = −1</code>. A complex number is <code>z = a + bi</code> with real <code>a</code> (the real part) and <code>b</code> (the imaginary part). Add them part by part. Multiply them like any bracket, then replace every <code>i²</code> with <code>−1</code>. Before the algebra, see one.</p>
+          <figure>
+            <div class="fbody">
+              <div class="two">
+                <div>
+                  <div class="sphere-wrap" style="max-width:260px"><canvas class="bloch" id="cvCplx"></canvas></div>
+                  <ul class="legend">
+                    <li><span class="sw zero"></span>z = a + bi</li>
+                    <li><span class="sw one faint"></span>z* = a − bi</li>
+                    <li><span class="sw phase"></span>angle θ</li>
+                    <li><span class="sw dash"></span>a and b</li>
+                  </ul>
+                </div>
+                <div>
+                  <p class="lbl">drag the point, or pick one</p>
+                  <div class="btns">
+                    <button class="b" type="button" data-z="1,1">1 + i</button>
+                    <button class="b" type="button" data-z="0,1">i</button>
+                    <button class="b" type="button" data-z="-1,0">−1</button>
+                    <button class="b" type="button" data-z="1.5,-2">1.5 − 2i</button>
+                    <button class="b" type="button" data-z="2,1.5">reset</button>
+                  </div>
+                  <div class="vals wide">
+                    <div><div class="t">a (real part)</div><div class="v" id="cxA"></div></div>
+                    <div><div class="t">b (imaginary part)</div><div class="v" id="cxB"></div></div>
+                    <div><div class="t">|z| = √(a² + b²)</div><div class="v" id="cxMod"></div></div>
+                    <div><div class="t">|z|²</div><div class="v" id="cxMod2"></div></div>
+                    <div><div class="t">z*</div><div class="v" id="cxConj"></div></div>
+                    <div><div class="t">θ</div><div class="v" id="cxTh"></div></div>
+                  </div>
+                  <p class="small" style="margin-top:12px" id="cxNote"></p>
+                </div>
+              </div>
+            </div>
+            <figcaption>A complex number is a point. Left and right is the real part <code>a</code>, up and down is the imaginary part <code>b</code>. The conjugate is the mirror image across the real axis, and the distance from the origin is the modulus.</figcaption>
+          </figure>
+          <div class="eq">(a + bi) + (c + di) = (a + c) + (b + d)i
+(a + bi)(c + di)   = ac + adi + bci + bd·i²
+                   = (ac − bd) + (ad + bc)i</div>
+
+          <div class="def">
+            <h4>Definition</h4>
+            <p><strong>Modulus and conjugate.</strong> The conjugate of <code>z = a + bi</code> is <code>z* = a − bi</code>. The modulus is <code>|z| = √(a² + b²)</code>, the distance from 0 in the plane. They connect through <code>z·z* = a² + b² = |z|²</code>. The workbook writes <code>|z|²</code> hundreds of times; it always means "multiply by the conjugate".</p>
+          </div>
+
+          <p>Draw <code>a + bi</code> as the point <code>(a, b)</code>. Then any complex number is a length <code>r</code> and an angle <code>θ</code>, and Euler's formula names the point on the unit circle at angle θ:</p>
+          <div class="eq">e^{iθ} = cos θ + i sin θ           so   z = r·e^{iθ}
+
+|e^{iθ}| = 1  for every θ
+e^{iα} · e^{iβ} = e^{i(α+β)}           multiplying adds angles</div>
+          <p>That last line is the fact to remember. Multiplying by <code>e^{iθ}</code> rotates by θ and changes no length. In quantum computing such a factor is called a <em>phase</em>, and it is invisible to <code>|z|²</code> because <code>|e^{iθ}|² = 1</code>. Move the slider and watch <code>z²</code> travel at twice the angle. The instrument after the worked example lets you multiply any two numbers, <code>z</code> and <code>w</code>, each set by its length and angle.</p>
+
+          <figure>
+            <div class="fbody">
+              <div class="two">
+                <div><div class="sphere-wrap" style="max-width:260px"><canvas class="bloch" id="cvCircle" style="cursor:default"></canvas></div><ul class="legend"><li><span class="sw zero"></span>z = e<sup>iθ</sup></li><li><span class="sw one faint"></span>z² = e<sup>2iθ</sup></li><li><span class="sw phase"></span>angle θ</li></ul></div>
+                <div>
+                  <div class="rowline"><label for="czSl">θ</label><input type="range" id="czSl" min="0" max="359" value="30" step="1"><output id="czOut">30°</output></div>
+                  <div class="vals">
+                    <div><div class="t">cos θ</div><div class="v" id="czRe">0.866</div></div>
+                    <div><div class="t">sin θ</div><div class="v" id="czIm">0.500</div></div>
+                    <div><div class="t">|z|²</div><div class="v">1.000</div></div>
+                    <div><div class="t">angle of z²</div><div class="v" id="czSq">60°</div></div>
+                  </div>
+                  <p class="small" style="margin-top:12px">The modulus never changes, so <code>|z|²</code> stays at 1 no matter what θ does.</p>
+                </div>
+              </div>
+            </div>
+            <figcaption>A phase is a point on this circle. Two states that differ only by a phase give the same <code>|z|²</code>, which is why lesson 3 can throw one of them away.</figcaption>
+          </figure>
+
+          <div class="worked">
+            <h4>Worked example: three products</h4>
+            <ol>
+              <li><code>(1 + i)(1 − i) = 1 − i + i − i² = 1 − (−1) = 2</code>. A number times its conjugate is real, and equals <code>|1 + i|² = 1² + 1² = 2</code>.</li>
+              <li><code>(1 + i)² = 1 + 2i + i² = 2i</code>. On the plane, <code>1 + i</code> sits at 45°; squaring it lands at 90°, which is the imaginary axis. Angles added.</li>
+              <li><code>|(1 + i)/√2|² = (1² + 1²)/2 = 1</code>. So <code>(1 + i)/√2 = e^{iπ/4}</code>, a pure phase. It shows up in lesson 5 as the <code>T</code> gate.</li>
+            </ol>
+          </div>
+
+          <figure>
+            <div class="fbody">
+              <div class="two">
+                <div><div class="sphere-wrap" style="max-width:260px"><canvas class="bloch" id="cvProd" style="cursor:default"></canvas></div><ul class="legend"><li><span class="sw zero"></span>z</li><li><span class="sw phase"></span>w</li><li><span class="sw one"></span>z·w</li><li><span class="sw dash"></span>angles, same colours</li></ul></div>
+                <div>
+                  <p class="lbl">z</p>
+                  <div class="rowline"><label for="cpR1">|z|</label><input type="range" id="cpR1" min="0" max="140" value="120" step="5"><output id="cpR1o">1.20</output></div>
+                  <div class="rowline"><label for="cpT1">θ</label><input type="range" id="cpT1" min="0" max="359" value="40" step="1"><output id="cpT1o">40°</output></div>
+                  <p class="lbl">w</p>
+                  <div class="rowline"><label for="cpR2">|w|</label><input type="range" id="cpR2" min="0" max="140" value="80" step="5"><output id="cpR2o">0.80</output></div>
+                  <div class="rowline"><label for="cpT2">φ</label><input type="range" id="cpT2" min="0" max="359" value="70" step="1"><output id="cpT2o">70°</output></div>
+                  <div class="vals wide">
+                    <div><div class="t">z</div><div class="v" id="cpZ"></div></div>
+                    <div><div class="t">w</div><div class="v" id="cpW"></div></div>
+                    <div><div class="t">z·w</div><div class="v" id="cpZW"></div></div>
+                    <div><div class="t">|z|·|w|</div><div class="v" id="cpMod"></div></div>
+                    <div><div class="t">θ + φ</div><div class="v" id="cpAng"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption>Multiplying two complex numbers. <code>z</code> has length <code>|z|</code> and angle θ; <code>w</code> has length <code>|w|</code> and angle φ. The product <code>z·w</code> sits at angle <code>θ + φ</code> with length <code>|z|·|w|</code>. Set both lengths to 1.00 and only the angle moves: that is a phase.</figcaption>
+          </figure>
+          <h3>Vectors</h3>
+          <p>A vector here is a column of complex numbers. Add columns entry by entry; multiply a column by a number by scaling every entry. The one operation that needs care is the inner product, because the first vector gets conjugated:</p>
+          <div class="eq">u = [u₁]    v = [v₁]        ⟨u, v⟩ = u₁* v₁ + u₂* v₂
+    [u₂]        [v₂]
+
+‖v‖² = ⟨v, v⟩ = |v₁|² + |v₂|²         (always real, never negative)</div>
+          <p>Two vectors with <code>⟨u, v⟩ = 0</code> are <strong>orthogonal</strong>. A vector with <code>‖v‖ = 1</code> is <strong>normalised</strong>. Every quantum state is a normalised vector, and lesson 2 explains why orthogonal ones are the only ones a measurement can tell apart for certain. Drag the arrows below until the shadow disappears.</p>
+
+          <figure>
+            <div class="fbody">
+              <div class="two">
+                <div><div class="sphere-wrap" style="max-width:260px"><canvas class="bloch" id="cvInner"></canvas></div><ul class="legend"><li><span class="sw zero"></span>u</li><li><span class="sw one"></span>v</li><li><span class="sw phase"></span>shadow of v on u</li><li><span class="sw ok"></span>right angle</li></ul></div>
+                <div>
+                  <p class="lbl">drag the tips of u and v</p>
+                  <div class="btns">
+                    <button class="b" type="button" id="ipPerp">make v ⊥ u</button>
+                    <button class="b" type="button" id="ipAlign">make v ∥ u</button>
+                    <button class="b" type="button" id="ipReset">reset</button>
+                  </div>
+                  <div class="vals wide">
+                    <div><div class="t">u</div><div class="v" id="ipU"></div></div>
+                    <div><div class="t">v</div><div class="v" id="ipV"></div></div>
+                    <div><div class="t">⟨u, v⟩</div><div class="v" id="ipDot"></div></div>
+                    <div><div class="t">‖u‖</div><div class="v" id="ipNu"></div></div>
+                    <div><div class="t">‖v‖</div><div class="v" id="ipNv"></div></div>
+                    <div><div class="t">angle</div><div class="v" id="ipAng"></div></div>
+                  </div>
+                  <p class="small" style="margin-top:12px" id="ipStatus"></p>
+                </div>
+              </div>
+            </div>
+            <figcaption>Inner product of two real vectors. The short bar along <code>u</code> is the shadow of <code>v</code> on <code>u</code>; its signed length times <code>‖u‖</code> is <code>⟨u, v⟩</code>. When the shadow vanishes the vectors are orthogonal. Real entries only here, so no conjugate is needed; with complex entries the first vector gets conjugated first.</figcaption>
+          </figure>
+          <div class="worked">
+            <h4>Worked example: an inner product with a conjugate in it</h4>
+            <ol>
+              <li>Take <code>u = [1, i]ᵀ/√2</code> and <code>v = [1, −i]ᵀ/√2</code>.</li>
+              <li>Conjugate <code>u</code> first: <code>u* = [1, −i]/√2</code>.</li>
+              <li><code>⟨u, v⟩ = (1·1 + (−i)(−i))/2 = (1 + i²)/2 = (1 − 1)/2 = 0</code>. Orthogonal.</li>
+              <li>Forget the conjugate and you get <code>(1 + (i)(−i))/2 = (1 + 1)/2 = 1</code>, which is wrong. The conjugate is not optional.</li>
+            </ol>
+          </div>
+
+          <h3>Matrices</h3>
+          <p>A 2×2 matrix turns one column into another. Each output entry is a row of the matrix dotted with the input column. Matrix times matrix is the same rule applied column by column, and the result depends on the order.</p>
+          <div class="eq">[a b] [x]   [ax + by]           [a b][e f]   [ae + bg   af + bh]
+[c d] [y] = [cx + dy]           [c d][g h] = [ce + dg   cf + dh]</div>
+
+          <div class="def">
+            <h4>Definition</h4>
+            <p><strong>Dagger and unitary.</strong> <code>M†</code> (conjugate transpose) flips the matrix across its diagonal and conjugates every entry. A matrix is <strong>unitary</strong> when <code>U†U = I</code>. Unitary matrices preserve every inner product, so they preserve lengths and angles: they are the rotations and reflections of complex space. Every quantum gate is one.</p>
+          </div>
+
+          <figure>
+            <div class="fbody">
+              <div class="two">
+                <div><div class="sphere-wrap" style="max-width:260px"><canvas class="bloch" id="cvMat" style="cursor:default"></canvas></div><ul class="legend"><li><span class="sw zero faint"></span>e₁</li><li><span class="sw zero"></span>M e₁</li><li><span class="sw one faint"></span>e₂</li><li><span class="sw one"></span>M e₂</li><li><span class="sw dash"></span>unit circle after M</li></ul></div>
+                <div>
+                  <p class="lbl">matrix</p>
+                  <div class="btns" id="mxBtns">
+                    <button class="b" type="button" data-m="I">I</button>
+                    <button class="b" type="button" data-m="X">X</button>
+                    <button class="b" type="button" data-m="Z">Z</button>
+                    <button class="b" type="button" data-m="H" aria-pressed="true">H</button>
+                    <button class="b" type="button" data-m="R">R(θ)</button>
+                    <button class="b" type="button" data-m="S">shear</button>
+                  </div>
+                  <div class="rowline"><label for="mxTh">θ</label><input type="range" id="mxTh" min="0" max="359" value="45" step="1"><output id="mxTho">45°</output></div>
+                  <div class="vals wide">
+                    <div><div class="t">M</div><div class="v" id="mxM"></div></div>
+                    <div><div class="t">MᵀM</div><div class="v" id="mxMM"></div></div>
+                    <div><div class="t">‖M e₁‖, ‖M e₂‖</div><div class="v" id="mxLen"></div></div>
+                    <div><div class="t">unitary</div><div class="v" id="mxUni"></div></div>
+                  </div>
+                  <p class="small" style="margin-top:12px">Faint arrows: <code>e₁ = [1, 0]ᵀ</code> and <code>e₂ = [0, 1]ᵀ</code>. Solid arrows: <code>M e₁</code> and <code>M e₂</code>, which are the columns of <code>M</code>. The dashed outline is where the unit circle lands.</p>
+                </div>
+              </div>
+            </div>
+            <figcaption>What a 2×2 matrix does to the plane. Unitary matrices keep the circle a circle and the arrows at right angles: rotations and reflections only. The shear stretches it into an ellipse, and <code>MᵀM ≠ I</code> reports that. Real matrices only; <code>S</code> and <code>T</code> need the complex plane and wait for lesson 5.</figcaption>
+          </figure>
+          <div class="worked">
+            <h4>Worked example: checking the Hadamard matrix</h4>
+            <ol>
+              <li><code>H = (1/√2)·[1 1; 1 −1]</code>. All entries are real, so <code>H†</code> is just the transpose, which is <code>H</code> itself.</li>
+              <li><code>H†H = (1/2)·[1·1+1·1, 1·1+1·(−1); 1·1+(−1)·1, 1·1+(−1)(−1)] = (1/2)·[2 0; 0 2] = I</code>. Unitary.</li>
+              <li>Apply it: <code>H·[1, 0]ᵀ = [1/√2, 1/√2]ᵀ</code>. A definite input became an equal mix. Lesson 5 draws this as a rotation.</li>
+              <li>Order matters. With <code>Z = [1 0; 0 −1]</code>: <code>HZ = (1/√2)[1 −1; 1 1]</code> but <code>ZH = (1/√2)[1 1; −1 −1]</code>. Different matrices.</li>
+            </ol>
+          </div>
+
+          <h3>Tensor product, briefly</h3>
+          <p>To describe two systems at once, combine their vectors with <code>⊗</code>. Every entry of the first multiplies the whole of the second, so sizes multiply: two 2-entry columns give one 4-entry column. Lesson 7 builds on this.</p>
+          <div class="eq">[a] ⊗ [c]   [a·c]
+[b]   [d] = [a·d]
+            [b·c]
+            [b·d]</div>
+          <figure>
+            <div class="fbody">
+              <div class="two">
+                <div>
+                  <p class="lbl">a = [cos α, sin α]ᵀ</p>
+                  <div class="rowline"><label for="tpA">α</label><input type="range" id="tpA" min="0" max="359" value="30" step="1"><output id="tpAo">30°</output></div>
+                  <p class="lbl">b = [cos β, sin β]ᵀ</p>
+                  <div class="rowline"><label for="tpB">β</label><input type="range" id="tpB" min="0" max="359" value="60" step="1"><output id="tpBo">60°</output></div>
+                  <div class="vals">
+                    <div><div class="t">a</div><div class="v" id="tpAv"></div></div>
+                    <div><div class="t">b</div><div class="v" id="tpBv"></div></div>
+                    <div><div class="t">sum of squares</div><div class="v" id="tpSum"></div></div>
+                  </div>
+                </div>
+                <div>
+                  <p class="lbl">a ⊗ b, four entries</p>
+                  <div class="bar"><span>a₁b₁</span><div class="track"><div class="fill" id="tp0"></div></div><span class="n" id="tp0v"></span></div>
+                  <div class="bar"><span>a₁b₂</span><div class="track"><div class="fill" id="tp1"></div></div><span class="n" id="tp1v"></span></div>
+                  <div class="bar"><span>a₂b₁</span><div class="track"><div class="fill" id="tp2"></div></div><span class="n" id="tp2v"></span></div>
+                  <div class="bar"><span>a₂b₂</span><div class="track"><div class="fill" id="tp3"></div></div><span class="n" id="tp3v"></span></div>
+                  <ul class="legend"><li><span class="sw zero"></span>positive entry</li><li><span class="sw one"></span>negative entry</li></ul>
+                  <p class="small" style="margin-top:12px">Bar length is the size of the entry. Two entries in, two entries in, four entries out.</p>
+                </div>
+              </div>
+            </div>
+            <figcaption>The tensor product of two unit vectors. Every entry of <code>a</code> multiplies every entry of <code>b</code>. Both inputs have length 1, and the squares of the four outputs always add to 1 as well: a two-qubit state is born normalised.</figcaption>
+          </figure>
+
+          <div class="exercises">
+            <h3>Exercises</h3>
+            <ol>
+              <li><div>
+                <p class="q">Compute <code>(2 + 3i)(1 − i)</code> and <code>|2 + 3i|²</code>.</p>
+                <details><summary>answer</summary><div class="inner"><p><code>(2 + 3i)(1 − i) = 2 − 2i + 3i − 3i² = 2 + i + 3 = 5 + i</code>. And <code>|2 + 3i|² = 4 + 9 = 13</code>. Check with the conjugate: <code>(2 + 3i)(2 − 3i) = 4 − 9i² = 13</code>.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Write <code>e^{iπ}</code> and <code>e^{iπ/2}</code> as ordinary complex numbers. What does multiplying by each one do to a point in the plane?</p>
+                <details><summary>answer</summary><div class="inner"><p><code>e^{iπ} = cos π + i sin π = −1</code>, a half turn. <code>e^{iπ/2} = i</code>, a quarter turn anticlockwise. So <code>i · i = −1</code> is two quarter turns making a half turn, which is the geometric reason <code>i² = −1</code>.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Is <code>v = [1/2, (√3/2)·i]ᵀ</code> normalised? Is it orthogonal to <code>[1, 0]ᵀ</code>?</p>
+                <details><summary>answer</summary><div class="inner"><p>Normalised: <code>|1/2|² + |(√3/2)i|² = 1/4 + 3/4 = 1</code>. Not orthogonal to <code>[1, 0]ᵀ</code>: the inner product is <code>1·(1/2) + 0 = 1/2 ≠ 0</code>.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Let <code>S = [1 0; 0 i]</code>. Find <code>S†</code>, check <code>S†S = I</code>, and compute <code>S·S</code>.</p>
+                <details><summary>answer</summary><div class="inner"><p><code>S† = [1 0; 0 −i]</code>. <code>S†S = [1 0; 0 (−i)(i)] = [1 0; 0 1] = I</code>, so unitary. <code>S·S = [1 0; 0 i²] = [1 0; 0 −1]</code>, which is the <code>Z</code> matrix from the worked example. Two <code>S</code> gates make one <code>Z</code>.</p></div></details>
+              </div></li>
+            </ol>
+          </div>
+
+          <div class="doneline"><input type="checkbox" id="d0"><label for="d0">mark lesson 0 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 1 ================= -->
+      <section class="lesson" id="l1" data-title="Amplitudes">
+        <div class="lhead">
+          <div class="lnum">01</div>
+          <h2>Amplitudes, and why they are not probabilities</h2>
+          <p class="goal">By the end: you can say what a quantum computer stores, and why cancellation is the point.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>A classical probabilistic computer stores a probability for each possible state. Probabilities are real numbers between 0 and 1, and they only ever accumulate. Two different ways of reaching the same outcome make that outcome more likely, never less.</p>
+          <p>A quantum computer stores an <strong>amplitude</strong> for each possible state. Amplitudes are complex numbers. The probability of an outcome is the squared magnitude of its amplitude. Because amplitudes are complex, two ways of reaching the same outcome can arrive as <code>+0.5</code> and <code>−0.5</code> and add to zero.</p>
+
+          <div class="def">
+            <h4>Definition</h4>
+            <p><strong>Amplitude.</strong> A complex number attached to a possible outcome. If outcome <code>k</code> has amplitude <code>c_k</code>, you observe <code>k</code> with probability <code>|c_k|²</code>. The amplitudes of a valid state satisfy <code>Σ|c_k|² = 1</code>.</p>
+          </div>
+
+          <p>Everything else in this workbook is machinery built on that one difference. Superposition gives you many amplitudes at once. Entanglement lets amplitudes of different qubits depend on each other. Interference is the act of making unwanted amplitudes cancel. Only the third one produces speedups.</p>
+
+          <div class="worked">
+            <h4>Worked example: two paths</h4>
+            <ol>
+              <li>A process reaches outcome <code>A</code> by two paths, with amplitudes <code>1/√2</code> and <code>−1/√2</code>. Total amplitude for <code>A</code>: <code>1/√2 − 1/√2 = 0</code>. Probability of <code>A</code>: <code>0</code>. It never happens.</li>
+              <li>Now suppose the same two paths were classical, each with probability <code>1/2</code>. Total probability of <code>A</code>: <code>1</code>. It always happens.</li>
+              <li>Same two paths, opposite conclusions. The minus sign is only available to amplitudes, and it is worth the entire field.</li>
+            </ol>
+          </div>
+
+          <details>
+            <summary>Check yourself: a state has amplitudes 0.6 and 0.8 on two outcomes. Is it valid, and what are the probabilities?</summary>
+            <div class="inner"><p>Valid: <code>0.6² + 0.8² = 0.36 + 0.64 = 1</code>. The probabilities are 36% and 64%. Note that the amplitudes do not sum to 1, and they do not need to. Their squares do.</p></div>
+          </details>
+          <details>
+            <summary>Check yourself: why is "a quantum computer tries every answer at once" a bad description?</summary>
+            <div class="inner"><p>Every answer does carry an amplitude, but a measurement returns exactly one of them, chosen at random by the Born rule. Without an arrangement that makes the wrong answers cancel, you have paid a great deal of money for a random number generator. The useful step is the cancellation, not the superposition.</p></div>
+          </details>
+
+          <div class="doneline"><input type="checkbox" id="d1"><label for="d1">mark lesson 1 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 2 ================= -->
+      <section class="lesson" id="l2" data-title="Notation">
+        <div class="lhead">
+          <div class="lnum">02</div>
+          <h2>The notation, in one page</h2>
+          <p class="goal">By the end: you can read <code>⟨φ|ψ⟩</code> out loud and compute one.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>Physicists write column vectors as <em>kets</em>. There is nothing to it beyond the brackets.</p>
+          <div class="eq">|0⟩ = [1]        |1⟩ = [0]
+      [0]              [1]
+
+|ψ⟩ = α|0⟩ + β|1⟩ = [α]
+                    [β]</div>
+
+          <table>
+            <thead><tr><th>Symbol</th><th>Name</th><th>What it is</th></tr></thead>
+            <tbody>
+              <tr><td class="m">|ψ⟩</td><td>ket</td><td>a column vector of complex amplitudes</td></tr>
+              <tr><td class="m">⟨ψ|</td><td>bra</td><td>the conjugate transpose of that column: a row</td></tr>
+              <tr><td class="m">⟨φ|ψ⟩</td><td>inner product</td><td>a complex number, the amplitude for finding ψ to be φ</td></tr>
+              <tr><td class="m">|⟨φ|ψ⟩|²</td><td>Born rule</td><td>the probability of that outcome</td></tr>
+              <tr><td class="m">U†</td><td>dagger</td><td>conjugate transpose; <code>U</code> is unitary when <code>U†U = I</code></td></tr>
+              <tr><td class="m">A ⊗ B</td><td>tensor product</td><td>how two systems combine; dimensions multiply</td></tr>
+            </tbody>
+          </table>
+
+          <div class="worked">
+            <h4>Worked example: computing an inner product</h4>
+            <ol>
+              <li>Let <code>|ψ⟩ = (|0⟩ + |1⟩)/√2</code>, so its column is <code>[0.707, 0.707]ᵀ</code>.</li>
+              <li>The bra <code>⟨0|</code> is the row <code>[1, 0]</code>.</li>
+              <li><code>⟨0|ψ⟩ = 1(0.707) + 0(0.707) = 0.707</code>.</li>
+              <li>Probability of measuring 0: <code>|0.707|² = 0.5</code>. Half the time, as expected.</li>
+            </ol>
+          </div>
+
+          <p>Two facts about the inner product carry a lot of weight. If <code>⟨φ|ψ⟩ = 0</code> the states are <strong>orthogonal</strong>, meaning a single measurement can distinguish them with certainty. If it is nonzero, no measurement can. This is the whole reason quantum states cannot be read reliably.</p>
+
+          <div class="exercises">
+            <h3>Exercises</h3>
+            <ol>
+              <li>
+                <div>
+                  <p class="q">Write <code>|−⟩ = (|0⟩ − |1⟩)/√2</code> as a column vector, then compute <code>⟨+|−⟩</code> where <code>|+⟩ = (|0⟩ + |1⟩)/√2</code>.</p>
+                  <details><summary>answer</summary><div class="inner"><p><code>|−⟩ = [0.707, −0.707]ᵀ</code>. Then <code>⟨+|−⟩ = (0.707)(0.707) + (0.707)(−0.707) = 0</code>. They are orthogonal, so one measurement in the <code>{|+⟩,|−⟩}</code> basis tells them apart perfectly.</p></div></details>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <p class="q">Compute <code>⟨0|+⟩</code> and say what it means about telling <code>|0⟩</code> and <code>|+⟩</code> apart.</p>
+                  <details><summary>answer</summary><div class="inner"><p><code>⟨0|+⟩ = 0.707</code>, not zero, so the states are not orthogonal. No measurement distinguishes them reliably. Measure in the <code>Z</code> basis and <code>|+⟩</code> gives 0 half the time, looking exactly like <code>|0⟩</code>.</p></div></details>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <p class="q">Is <code>[0.5, 0.5]ᵀ</code> a valid qubit state? If not, fix it.</p>
+                  <details><summary>answer</summary><div class="inner"><p>No: <code>0.25 + 0.25 = 0.5 ≠ 1</code>. Divide by the norm <code>√0.5</code> to get <code>[0.707, 0.707]ᵀ</code>, which is <code>|+⟩</code>.</p></div></details>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="doneline"><input type="checkbox" id="d2"><label for="d2">mark lesson 2 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 3 ================= -->
+      <section class="lesson" id="l3" data-title="The qubit">
+        <div class="lhead">
+          <div class="lnum">03</div>
+          <h2>What a qubit is</h2>
+          <p class="goal">By the end: you can count the free parameters in a qubit and get 2.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>A bit is 0 or 1. A qubit is a unit vector in a two-dimensional complex space:</p>
+          <div class="eq">|ψ⟩ = α|0⟩ + β|1⟩     with α, β complex and |α|² + |β|² = 1</div>
+          <p>Measured in the <code>{|0⟩, |1⟩}</code> basis it gives 0 with probability <code>|α|²</code>. It is tempting to read that as "the qubit is secretly 0 or 1 and we don't know which". That reading is wrong, and lesson 9 shows an experiment that distinguishes the two cases.</p>
+
+          <h3>Counting the freedom</h3>
+          <p>Two complex numbers are four real numbers. Two constraints remove two of them:</p>
+          <ul>
+            <li><strong>Normalisation.</strong> <code>|α|² + |β|² = 1</code> removes one.</li>
+            <li><strong>Global phase.</strong> Multiplying the whole state by <code>e^{iγ}</code> changes no measurable quantity at all, in any basis, ever. So <code>|ψ⟩</code> and <code>e^{iγ}|ψ⟩</code> are the same physical state, and that removes another.</li>
+          </ul>
+          <p>Two real parameters remain. A two-parameter family of states is exactly a sphere, which is why lesson 4 can draw the whole state space.</p>
+
+          <div class="def">
+            <h4>Definition</h4>
+            <p><strong>Relative phase.</strong> The phase difference between <code>α</code> and <code>β</code>. Unlike global phase, it is physical. <code>(|0⟩+|1⟩)/√2</code> and <code>(|0⟩−|1⟩)/√2</code> give identical measurement statistics in the <code>Z</code> basis and are nonetheless perfectly distinguishable, because you can measure in a different basis.</p>
+          </div>
+
+          <div class="eq">Standard form, used everywhere from here on:
+
+|ψ⟩ = cos(θ/2)|0⟩ + e^{iφ} sin(θ/2)|1⟩
+
+  θ from 0 to π      sets the probabilities
+  φ from 0 to 2π     sets the relative phase</div>
+          <p>The <code>θ/2</code> is not a typo. It is what makes <code>θ = π</code> (a half turn on the sphere) send <code>|0⟩</code> to <code>|1⟩</code>, which are orthogonal rather than opposite.</p>
+
+          <div class="exercises">
+            <h3>Exercises</h3>
+            <ol>
+              <li><div>
+                <p class="q">What are θ and φ for <code>|1⟩</code>? Why is φ meaningless there?</p>
+                <details><summary>answer</summary><div class="inner"><p><code>θ = π</code>, and φ can be anything. At <code>θ = π</code> the coefficient of <code>|0⟩</code> is zero, so <code>e^{iφ}</code> multiplies the entire state and becomes a global phase. On the sphere: at the pole, longitude has no meaning.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Are <code>|ψ⟩ = 0.6|0⟩ + 0.8|1⟩</code> and <code>|χ⟩ = −0.6|0⟩ − 0.8|1⟩</code> different states?</p>
+                <details><summary>answer</summary><div class="inner"><p>No. <code>|χ⟩ = −1 · |ψ⟩</code>, and <code>−1 = e^{iπ}</code> is a global phase. Same physical state. But <code>0.6|0⟩ − 0.8|1⟩</code> <em>is</em> different, because there the sign is relative.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">A qubit has <code>|α|² = 0.09</code>. Give a valid pair (α, β) with real, non-negative entries.</p>
+                <details><summary>answer</summary><div class="inner"><p><code>α = 0.3</code>, <code>β = √0.91 ≈ 0.954</code>. Check: <code>0.09 + 0.91 = 1</code>.</p></div></details>
+              </div></li>
+            </ol>
+          </div>
+
+          <div class="doneline"><input type="checkbox" id="d3"><label for="d3">mark lesson 3 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 4 ================= -->
+      <section class="lesson" id="l4" data-title="Bloch sphere">
+        <div class="lhead">
+          <div class="lnum">04</div>
+          <h2>The Bloch sphere</h2>
+          <p class="goal">By the end: you can locate any single-qubit state by eye, and say what the inside of the sphere means.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>Plot the two free parameters as polar angle θ and azimuth φ, and every pure state of one qubit becomes a point on a sphere. The instrument below is that sphere. Drag it to change your viewpoint; the sliders and buttons change the state.</p>
+
+          <figure>
+            <div class="fbody">
+              <div class="two">
+                <div>
+                  <div class="sphere-wrap"><canvas class="bloch" id="cvExplore"></canvas></div>
+                  <ul class="legend"><li><span class="sw grad"></span>state arrow, |0⟩ to |1⟩</li><li><span class="sw dash"></span>drop to the equator</li></ul>
+                </div>
+                <div>
+                  <div class="rowline"><label for="thSl">θ</label><input type="range" id="thSl" min="0" max="180" value="0" step="1"><output id="thOut">0°</output></div>
+                  <div class="rowline"><label for="phSl">φ</label><input type="range" id="phSl" min="0" max="359" value="0" step="1"><output id="phOut">0°</output></div>
+                  <p class="lbl">jump to</p>
+                  <div class="btns" id="presets">
+                    <button class="b" type="button" data-t="0" data-p="0">|0⟩</button>
+                    <button class="b" type="button" data-t="180" data-p="0">|1⟩</button>
+                    <button class="b" type="button" data-t="90" data-p="0">|+⟩</button>
+                    <button class="b" type="button" data-t="90" data-p="180">|−⟩</button>
+                    <button class="b" type="button" data-t="90" data-p="90">|+i⟩</button>
+                    <button class="b" type="button" data-t="90" data-p="270">|−i⟩</button>
+                  </div>
+                  <div class="vals">
+                    <div><div class="t">α</div><div class="v" id="rAlpha">1.000</div></div>
+                    <div><div class="t">β</div><div class="v" id="rBeta">0.000</div></div>
+                    <div><div class="t">P(0)</div><div class="v" id="rP0">100.0%</div></div>
+                    <div><div class="t">P(1)</div><div class="v" id="rP1">0.0%</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption>State: <span id="expName">|0⟩</span>. The dashed lines drop the state vector onto the equatorial plane, so you can read θ and φ off the picture.</figcaption>
+          </figure>
+
+          <h3>Things to try, in order</h3>
+          <ul>
+            <li>Set θ to 90° and sweep φ all the way around. Watch <code>P(0)</code> and <code>P(1)</code>. They never move. Relative phase is invisible to a <code>Z</code> measurement.</li>
+            <li>Set φ to 0 and sweep θ from 0 to 180°. Now the probabilities do move, following <code>cos²(θ/2)</code>.</li>
+            <li>Find the two states with <code>P(0) = 0.5</code> that are furthest apart on the sphere. They are <code>|+⟩</code> and <code>|−⟩</code>, on opposite sides.</li>
+          </ul>
+
+          <h3>How to read the sphere</h3>
+          <table>
+            <tbody>
+              <tr><td class="m">north pole</td><td><code>|0⟩</code>. The only points that give a certain answer are the two poles of whichever axis you measure along.</td></tr>
+              <tr><td class="m">south pole</td><td><code>|1⟩</code>.</td></tr>
+              <tr><td class="m">equator</td><td>Every point gives 50/50 in the <code>Z</code> basis. The points differ only by relative phase.</td></tr>
+              <tr><td class="m">opposite points</td><td>Orthogonal, therefore perfectly distinguishable. Note that this is 90° in Hilbert space but 180° on the sphere.</td></tr>
+              <tr><td class="m">inside</td><td>Shorter arrows are <strong>mixed states</strong>: classical uncertainty about which pure state you hold. Noise pushes states inward. The centre is total ignorance.</td></tr>
+            </tbody>
+          </table>
+
+          <details>
+            <summary>Check yourself: a friend says the Bloch sphere shows a qubit "spinning between 0 and 1". What is wrong with that?</summary>
+            <div class="inner"><p>Nothing is spinning and nothing is moving between values. The arrow is a static picture of two numbers, θ and φ. It only moves when you apply a gate. A qubit sitting in <code>|+⟩</code> stays at <code>|+⟩</code> indefinitely, and <code>|+⟩</code> is as definite a state as <code>|0⟩</code>.</p></div>
+          </details>
+          <details>
+            <summary>Check yourself: why can't two qubits be drawn as two spheres?</summary>
+            <div class="inner"><p>Sometimes they can, when the pair happens to factorise. But four amplitudes carry six free parameters after normalisation and global phase, while two spheres carry only four. The missing two are the correlations, which is where entanglement lives. Lesson 8 makes that concrete by shrinking an arrow to nothing.</p></div>
+          </details>
+
+          <div class="doneline"><input type="checkbox" id="d4"><label for="d4">mark lesson 4 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 5 ================= -->
+      <section class="lesson" id="l5" data-title="Gates">
+        <div class="lhead">
+          <div class="lnum">05</div>
+          <h2>Gates are rotations</h2>
+          <p class="goal">By the end: you can predict where a gate sends a state before you press the button.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>Rule 2 of quantum mechanics says a closed system evolves by a unitary matrix: <code>|ψ'⟩ = U|ψ⟩</code> with <code>U†U = I</code>. Unitary means lengths are preserved, so states stay on the sphere. Every such matrix on one qubit is a rotation of that sphere about some axis. This is exactly true, not an analogy.</p>
+
+          <div class="eq">Rotation by angle a about unit axis n:
+
+U = cos(a/2)·I − i·sin(a/2)·(n_x X + n_y Y + n_z Z)
+
+X = [0 1]    Y = [0 −i]    Z = [1  0]
+    [1 0]        [i  0]        [0 −1]</div>
+
+          <p>The three Pauli matrices <code>X</code>, <code>Y</code>, <code>Z</code> plus the identity span every 2×2 matrix, so this one formula covers all single-qubit gates.</p>
+
+          <table>
+            <thead><tr><th>Gate</th><th>Rotation</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td class="m">X</td><td>180° about x</td><td>bit flip, <code>|0⟩ ↔ |1⟩</code></td></tr>
+              <tr><td class="m">Z</td><td>180° about z</td><td>phase flip, <code>|1⟩ → −|1⟩</code>; leaves the poles alone</td></tr>
+              <tr><td class="m">Y</td><td>180° about y</td><td>both at once</td></tr>
+              <tr><td class="m">H</td><td>180° about x+z</td><td>swaps the z and x axes; turns <code>|0⟩</code> into <code>|+⟩</code></td></tr>
+              <tr><td class="m">S, T</td><td>90°, 45° about z</td><td>add relative phase without touching probabilities</td></tr>
+              <tr><td class="m">Rx Ry Rz</td><td>any angle</td><td>what the hardware actually implements</td></tr>
+            </tbody>
+          </table>
+
+          <figure>
+            <div class="fbody">
+              <div class="two">
+                <div>
+                  <div class="sphere-wrap"><canvas class="bloch" id="cvGate"></canvas></div>
+                  <ul class="legend"><li><span class="sw grad"></span>state arrow, |0⟩ to |1⟩</li><li><span class="sw phase"></span>path of the last gate</li><li><span class="sw dash"></span>drop to the equator</li></ul>
+                </div>
+                <div>
+                  <p class="lbl">named gates</p>
+                  <div class="btns" id="gateRow">
+                    <button class="b" type="button" data-g="X">X</button>
+                    <button class="b" type="button" data-g="Y">Y</button>
+                    <button class="b" type="button" data-g="Z">Z</button>
+                    <button class="b" type="button" data-g="H">H</button>
+                    <button class="b" type="button" data-g="S">S</button>
+                    <button class="b" type="button" data-g="T">T</button>
+                  </div>
+                  <div class="rowline"><label for="rotSl">angle</label><input type="range" id="rotSl" min="0" max="360" step="5" value="90"><output id="rotOut">90°</output></div>
+                  <div class="btns" id="rotRow">
+                    <button class="b" type="button" data-r="x">Rx</button>
+                    <button class="b" type="button" data-r="y">Ry</button>
+                    <button class="b" type="button" data-r="z">Rz</button>
+                    <button class="b" type="button" id="gateReset">back to |0⟩</button>
+                  </div>
+                  <p class="lbl">circuit so far</p>
+                  <div class="tape" id="tape"><span class="e">|0⟩ with no gates applied</span></div>
+                  <div class="vals" style="margin-top:12px">
+                    <div><div class="t">θ</div><div class="v" id="gTheta">0.0°</div></div>
+                    <div><div class="t">φ</div><div class="v" id="gPhi">0.0°</div></div>
+                    <div><div class="t">P(0)</div><div class="v" id="gP0">100.0%</div></div>
+                    <div><div class="t">P(1)</div><div class="v" id="gP1">0.0%</div></div>
+                  </div>
+                </div>
+              </div>
+              <p class="lbl" style="margin-top:16px">challenges. The marker fills in when you reach the target</p>
+              <ul class="tasks" id="tasks">
+                <li data-target="1,0,0"><span class="mk">○</span><span>Reach <code>|+⟩</code> from <code>|0⟩</code> using one gate.</span></li>
+                <li data-target="0,1,0"><span class="mk">○</span><span>Reach <code>|+i⟩</code> using two gates.</span></li>
+                <li data-target="0,0,-1"><span class="mk">○</span><span>Reach <code>|1⟩</code> without ever pressing X.</span></li>
+                <li data-target="-1,0,0"><span class="mk">○</span><span>Reach <code>|−⟩</code>, then get back to <code>|0⟩</code> without pressing reset.</span></li>
+              </ul>
+            </div>
+            <figcaption>State: <span id="gateStateName">|0⟩</span>. The faint trail shows the path the last gate took, which is the rotation itself.</figcaption>
+          </figure>
+
+          <h3>Two properties worth internalising</h3>
+          <ul>
+            <li><strong>Every gate is reversible.</strong> <code>X·X = I</code>, <code>H·H = I</code>. No quantum gate can erase information; only measurement does that. Classical AND is not reversible, which is why classical circuits need rewriting before they can run on quantum hardware.</li>
+            <li><strong>Order matters.</strong> Do <code>H</code> then <code>Z</code>, reset, then do <code>Z</code> then <code>H</code>. You land in different places, because the matrices do not commute. Rotations in three dimensions do not commute either, which is the same fact.</li>
+          </ul>
+          <p><strong>Universality.</strong> The set <code>{H, T, CNOT}</code> can approximate any quantum computation to any accuracy you like. Three gates is the whole instruction set.</p>
+
+          <div class="exercises">
+            <h3>Exercises</h3>
+            <ol>
+              <li><div>
+                <p class="q">Predict, then check with the instrument: what does <code>Z</code> do to <code>|0⟩</code>? What does it do to <code>|+⟩</code>?</p>
+                <details><summary>answer</summary><div class="inner"><p><code>Z|0⟩ = |0⟩</code>, since <code>|0⟩</code> lies on the rotation axis. Points on the axis of a rotation do not move. <code>Z|+⟩ = |−⟩</code>: on the equator, a 180° turn about z carries <code>|+⟩</code> to the far side.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Apply <code>H</code>, then <code>Z</code>, then <code>H</code>. Which single named gate does that equal?</p>
+                <details><summary>answer</summary><div class="inner"><p><code>X</code>. <code>H</code> swaps the x and z axes, so conjugating <code>Z</code> by <code>H</code> turns a z-rotation into an x-rotation. This trick, changing basis to make a hard gate easy, appears constantly.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Why can no sequence of <code>S</code> and <code>T</code> gates ever change <code>P(0)</code>?</p>
+                <details><summary>answer</summary><div class="inner"><p>Both are rotations about the z axis, so they change φ only, never θ. Probabilities in the <code>Z</code> basis depend on θ alone. To change them you need a rotation with a component off the z axis, such as <code>H</code>, <code>X</code>, or <code>Rx</code>.</p></div></details>
+              </div></li>
+            </ol>
+          </div>
+
+          <div class="doneline"><input type="checkbox" id="d5"><label for="d5">mark lesson 5 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 6 ================= -->
+      <section class="lesson" id="l6" data-title="Measurement">
+        <div class="lhead">
+          <div class="lnum">06</div>
+          <h2>Measurement</h2>
+          <p class="goal">By the end: you can explain why quantum programs are run thousands of times.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>Measurement is the only step that is not reversible. It takes the amplitudes, returns one classical outcome with probability equal to the squared magnitude, and leaves the qubit in the state corresponding to that outcome. Measure again and you get the same answer forever. The superposition is not revealed; it is gone.</p>
+          <p>So a single run tells you almost nothing. To learn a distribution you prepare the state again from scratch and run again. These repeats are called <strong>shots</strong>, and a typical job uses one to a hundred thousand of them. Below, set θ and take shots.</p>
+
+          <figure>
+            <div class="fbody">
+              <div class="rowline" style="max-width:420px"><label for="msTh">θ</label><input type="range" id="msTh" min="0" max="180" value="90" step="1"><output id="msThOut">90°</output></div>
+              <p class="lbl">theory</p>
+              <div class="bar"><span>P(0)</span><div class="track"><div class="fill" id="msTh0"></div></div><span class="n" id="msTh0v">50.0%</span></div>
+              <div class="bar"><span>P(1)</span><div class="track"><div class="fill o" id="msTh1"></div></div><span class="n" id="msTh1v">50.0%</span></div>
+              <p class="lbl" style="margin-top:14px">observed</p>
+              <div class="bar"><span>0</span><div class="track"><div class="fill" id="msC0"></div></div><span class="n" id="msC0v">0</span></div>
+              <div class="bar"><span>1</span><div class="track"><div class="fill o" id="msC1"></div></div><span class="n" id="msC1v">0</span></div>
+              <div class="btns" style="margin-top:14px">
+                <button class="b" type="button" id="shot1">1 shot</button>
+                <button class="b" type="button" id="shot20">20 shots</button>
+                <button class="b" type="button" id="shot500">500 shots</button>
+                <button class="b" type="button" id="shotClear">clear</button>
+              </div>
+              <div class="tape" id="shotLog"><span class="e">no outcomes yet</span></div>
+            </div>
+            <figcaption><span id="shotTotal">0 shots</span> taken. Watch how many shots it takes before the observed split settles near the theoretical one.</figcaption>
+          </figure>
+
+          <p>The error in an estimated probability shrinks like <code>1/√shots</code>. To halve your error bar you need four times the runs. That factor governs the cost of every quantum experiment you will read about.</p>
+
+          <div class="def">
+            <h4>Definition</h4>
+            <p><strong>Measurement basis.</strong> You choose which axis to measure along. Measuring <code>|+⟩</code> along z is a coin flip; measuring it along x is certain. In practice hardware only measures along z, so you rotate the state first: apply <code>H</code> before the measurement and you have measured along x. That is all a basis change is.</p>
+          </div>
+
+          <div class="exercises">
+            <h3>Exercises</h3>
+            <ol>
+              <li><div>
+                <p class="q">You measure a qubit and get 0. You measure it again immediately. What do you get, and with what probability?</p>
+                <details><summary>answer</summary><div class="inner"><p>0, with certainty. The first measurement left the state as <code>|0⟩</code>. This is also why measurement cannot be used to learn an unknown state: the first look destroys the thing you were trying to inspect.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">You want to distinguish <code>|+⟩</code> from <code>|−⟩</code> using hardware that only measures along z. What do you do?</p>
+                <details><summary>answer</summary><div class="inner"><p>Apply <code>H</code> first. It maps <code>|+⟩ → |0⟩</code> and <code>|−⟩ → |1⟩</code>, and then a z measurement separates them with certainty.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">With 100 shots you observe 58 zeros. Is the state consistent with <code>|+⟩</code>?</p>
+                <details><summary>answer</summary><div class="inner"><p>Yes. The standard deviation on 100 shots is about <code>√(0.25/100) = 5%</code>, so 58% is under two standard deviations from 50%. Take 10,000 shots and a genuine 58% would be unmistakable. Sample size is an honest part of every quantum result.</p></div></details>
+              </div></li>
+            </ol>
+          </div>
+
+          <div class="doneline"><input type="checkbox" id="d6"><label for="d6">mark lesson 6 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 7 ================= -->
+      <section class="lesson" id="l7" data-title="Two qubits">
+        <div class="lhead">
+          <div class="lnum">07</div>
+          <h2>Two qubits, and where 2ⁿ comes from</h2>
+          <p class="goal">By the end: you can build a two-qubit state with a tensor product and spot one that will not factorise.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>Rule 4: systems combine by tensor product. Two qubits have four basis states, so four amplitudes:</p>
+          <div class="eq">|ψ⟩ = c₀₀|00⟩ + c₀₁|01⟩ + c₁₀|10⟩ + c₁₁|11⟩
+
+n qubits →  2ⁿ amplitudes
+   10     →  1,024
+   50     →  about 10¹⁵      (a large supercomputer)
+  300     →  about 10⁹⁰      (more than the atoms in the visible universe)</div>
+
+          <div class="worked">
+            <h4>Worked example: building a product state</h4>
+            <ol>
+              <li>Qubit A in <code>|+⟩ = (|0⟩+|1⟩)/√2</code>, qubit B in <code>|0⟩</code>.</li>
+              <li>Tensor product: <code>(|0⟩+|1⟩)/√2 ⊗ |0⟩ = (|00⟩ + |10⟩)/√2</code>.</li>
+              <li>Amplitudes: <code>c₀₀ = c₁₀ = 0.707</code>, the rest zero. Measuring B always gives 0, whatever A does. The qubits are independent.</li>
+              <li>Now look at <code>(|00⟩ + |11⟩)/√2</code>. Try to write it as <code>(a|0⟩+b|1⟩) ⊗ (c|0⟩+d|1⟩)</code>. You would need <code>ad = 0</code> and <code>bc = 0</code>, but also <code>ac ≠ 0</code> and <code>bd ≠ 0</code>. No solution exists. That state does not factorise.</li>
+            </ol>
+          </div>
+
+          <p>States that do not factorise are <strong>entangled</strong>. No description of the individual qubits, however detailed, reproduces them.</p>
+
+          <h3>The gate that does it</h3>
+          <p>Single-qubit gates can never entangle anything; they act on each qubit separately. You need a gate on a pair. The standard one is <strong>CNOT</strong>: flip the target if the control is <code>|1⟩</code>.</p>
+          <div class="circuit">CNOT =  ⎡1 0 0 0⎤     control |0⟩ → target unchanged
+        ⎢0 1 0 0⎥     control |1⟩ → target flipped
+        ⎢0 0 0 1⎥
+        ⎣0 0 1 0⎦</div>
+          <p>Applied to a control that is in superposition, "flip if the control is 1" has no classical reading, because the control is not 1 or 0. The result is a state where neither qubit has a value of its own.</p>
+          <p class="small">On real hardware CNOT is the expensive gate. Its error rate is roughly ten times a single-qubit gate's, and it is only available between physically adjacent qubits. Two-qubit gate depth is the number that decides whether a program will run.</p>
+
+          <div class="doneline"><input type="checkbox" id="d7"><label for="d7">mark lesson 7 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 8 ================= -->
+      <section class="lesson" id="l8" data-title="Entanglement">
+        <div class="lhead">
+          <div class="lnum">08</div>
+          <h2>Entanglement</h2>
+          <p class="goal">By the end: you can say precisely what is strange about a Bell pair, and what is not.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>Build a Bell pair: apply <code>H</code> to qubit A, then CNOT from A to B. Toggle the gates below and watch two things at once. The bars are the joint measurement probabilities. The sphere is qubit A on its own.</p>
+
+          <figure>
+            <div class="fbody">
+              <div class="btns" id="bellRow">
+                <button class="b" type="button" data-b="x" aria-pressed="false">X on A</button>
+                <button class="b" type="button" data-b="h" aria-pressed="false">H on A</button>
+                <button class="b" type="button" data-b="cx" aria-pressed="false">CNOT A→B</button>
+                <button class="b" type="button" data-b="reset">clear</button>
+              </div>
+              <div class="circuit" id="bellCircuit">A: |0⟩ ─────
+B: |0⟩ ─────</div>
+              <div class="two" style="margin-top:16px;align-items:center">
+                <div><div class="sphere-wrap" style="max-width:210px"><canvas class="bloch" id="cvBell"></canvas></div><ul class="legend"><li><span class="sw grad"></span>qubit A’s arrow</li><li><span class="sw ring"></span>arrow gone: A entangled with B</li></ul></div>
+                <div>
+                  <p class="lbl">joint outcome probabilities</p>
+                  <div id="bellBars">
+                    <div class="bar"><span>|00⟩</span><div class="track"><div class="fill" data-i="0"></div></div><span class="n" data-v="0">100.0%</span></div>
+                    <div class="bar"><span>|01⟩</span><div class="track"><div class="fill" data-i="1"></div></div><span class="n" data-v="1">0.0%</span></div>
+                    <div class="bar"><span>|10⟩</span><div class="track"><div class="fill" data-i="2"></div></div><span class="n" data-v="2">0.0%</span></div>
+                    <div class="bar"><span>|11⟩</span><div class="track"><div class="fill" data-i="3"></div></div><span class="n" data-v="3">0.0%</span></div>
+                  </div>
+                  <ul class="legend" style="margin-left:0;max-width:none"><li><span class="sw zero"></span>A reads 0</li><li><span class="sw one"></span>A reads 1</li></ul>
+                  <div class="vals" style="margin-top:12px">
+                    <div><div class="t">length of A's arrow</div><div class="v" id="bellPurity">1.000</div></div>
+                    <div><div class="t">entanglement</div><div class="v" id="bellEnt">none</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption>Sphere shows qubit A alone (its reduced state). With H and CNOT both on, the pair is in a perfectly known state while A's arrow has zero length: nothing at all is known about A by itself.</figcaption>
+          </figure>
+
+          <h3>What is strange, and what is not</h3>
+          <ul>
+            <li><strong>Strange.</strong> The pair is in a completely specified pure state, yet each half is maximally uncertain. Classical systems cannot do this: if you know the whole, you know the parts.</li>
+            <li><strong>Strange.</strong> The correlations are stronger than any model where each qubit carried a hidden answer all along. Bell's theorem makes that precise, and experiments have confirmed it.</li>
+            <li><strong>Not strange.</strong> No information travels. A's outcomes are 50/50 no matter what is done to B, so nothing B does can be detected at A. Comparing results requires an ordinary classical message.</li>
+            <li><strong>Not strange.</strong> Correlated random outcomes alone are ordinary. Two envelopes with matching cards do that. The quantum part is that the correlation persists whichever basis both parties choose, which no pair of envelopes can manage.</li>
+          </ul>
+
+          <div class="def">
+            <h4>Definition</h4>
+            <p><strong>No-cloning theorem.</strong> No unitary can copy an unknown state: <code>U|ψ⟩|0⟩ = |ψ⟩|ψ⟩</code> for all <code>|ψ⟩</code> contradicts linearity. Consequences: you cannot back up a qubit, you cannot amplify a quantum signal the way you repeat a classical one, and eavesdropping on a quantum channel leaves marks. Quantum key distribution is built on that last point.</p>
+          </div>
+
+          <div class="exercises">
+            <h3>Exercises</h3>
+            <ol>
+              <li><div>
+                <p class="q">In the Bell pair, A is measured and gives 1. What does B give?</p>
+                <details><summary>answer</summary><div class="inner"><p>1, with certainty. The state <code>(|00⟩+|11⟩)/√2</code> has no <code>|10⟩</code> component, so once A is 1 the only surviving term is <code>|11⟩</code>. Before A was measured, neither qubit had a value.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Turn on CNOT without H. Is the result entangled? Why not?</p>
+                <details><summary>answer</summary><div class="inner"><p>No. The control is <code>|0⟩</code>, so the CNOT does nothing and the state stays <code>|00⟩</code>, a product state. A's arrow keeps full length. Entangling needs superposition on the control first.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Could Alice use a Bell pair to send Bob a bit instantly?</p>
+                <details><summary>answer</summary><div class="inner"><p>No. Whatever Alice does to her qubit, Bob's outcome statistics stay 50/50. He can only see the correlation after she tells him her results over a normal channel, which travels no faster than light.</p></div></details>
+              </div></li>
+            </ol>
+          </div>
+
+          <div class="doneline"><input type="checkbox" id="d8"><label for="d8">mark lesson 8 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 9 ================= -->
+      <section class="lesson" id="l9" data-title="Interference">
+        <div class="lhead">
+          <div class="lnum">09</div>
+          <h2>Interference, which is where speedups come from</h2>
+          <p class="goal">By the end: you can describe the shape every quantum algorithm shares.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>Here is the experiment promised in lesson 3. Take <code>|0⟩</code>, apply <code>H</code> to split it into two paths, add a phase φ to one path, then apply <code>H</code> again to recombine.</p>
+
+          <figure>
+            <div class="fbody">
+              <div class="circuit">|0⟩ ──[ H ]──[ phase φ ]──[ H ]──▶ measure</div>
+              <div class="rowline" style="max-width:420px;margin-top:14px"><label for="mzSl">φ</label><input type="range" id="mzSl" min="0" max="360" value="0" step="1"><output id="mzOut">0°</output></div>
+              <div class="bar"><span>P(0)</span><div class="track"><div class="fill" id="mz0"></div></div><span class="n" id="mz0v">100.0%</span></div>
+              <div class="bar"><span>P(1)</span><div class="track"><div class="fill o" id="mz1"></div></div><span class="n" id="mz1v">0.0%</span></div>
+            </div>
+            <figcaption>Currently <span id="mzTag">fully constructive</span>. The result is <code>P(0) = cos²(φ/2)</code>, not 50/50.</figcaption>
+          </figure>
+
+          <p>At <code>φ = 0</code> the two paths reinforce and the answer is 0 every single time. At <code>φ = 180°</code> they cancel exactly and the answer is never 0. A coin flipped twice is never certain of anything; this is certain, and the phase decides which way.</p>
+          <p>This also settles the question from lesson 3. If the qubit after the first <code>H</code> were secretly 0 or 1, the second <code>H</code> would leave it at 50/50 regardless of φ. It does not. So it was not secretly either.</p>
+
+          <div class="worked">
+            <h4>The shape of every quantum algorithm</h4>
+            <ol>
+              <li><strong>Spread.</strong> Put the input register into superposition, usually with a layer of <code>H</code> gates, so every candidate answer carries amplitude.</li>
+              <li><strong>Compute in phase.</strong> Apply a circuit that writes something about each candidate into its phase, rather than into a value you read.</li>
+              <li><strong>Interfere.</strong> Apply a transform, often the quantum Fourier transform, that makes the wrong candidates cancel and the right ones reinforce.</li>
+              <li><strong>Measure.</strong> Read the survivor. Repeat for shots and post-process classically.</li>
+            </ol>
+          </div>
+
+          <p>Step 3 is the hard one, and it is why quantum algorithms are rare. Spreading amplitude is easy. Making exactly the wrong answers cancel requires structure in the problem: Shor's algorithm works because factoring hides a periodicity a Fourier transform can find. Problems without that kind of structure get no exponential speedup, and there is good reason to think none exists for them.</p>
+          <p class="small">The same fragility runs the other way. If anything in the environment records which path was taken, the cancellation stops working. That leak is decoherence, and it is the subject of lesson 11.</p>
+
+          <div class="doneline"><input type="checkbox" id="d9"><label for="d9">mark lesson 9 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 10 ================= -->
+      <section class="lesson" id="l10" data-title="Circuits and Qiskit">
+        <div class="lhead">
+          <div class="lnum">10</div>
+          <h2>Circuits, and the same thing in Qiskit</h2>
+          <p class="goal">By the end: you can read a circuit diagram, build it in Qiskit, run it, and read the counts.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>A circuit diagram reads left to right. Horizontal lines are qubits, boxes are gates, the double line at the bottom carries classical bits from the measurements. Depth, meaning the number of gate layers, is what noise limits.</p>
+          <p>The cells below are a notebook. Every output was produced by running the cell shown, on Qiskit 2.5.2 and qiskit-aer 0.17.2. Copy a cell into Jupyter, or download the whole thing as <code>.ipynb</code> and run it top to bottom.</p>
+
+          <div class="nb">
+            <div class="nbhead"><span>setup</span><span class="nbtag">terminal</span></div>
+            <div class="cell" data-shell="1">
+              <div class="pr in">$</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code>pip install qiskit qiskit-aer</code></pre></div>
+            </div>
+            <div class="cell">
+              <div class="pr in">In [1]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="kw">import</span> qiskit
+qiskit.__version__</code></pre></div>
+              <div class="res"><div class="pr out">Out[1]:</div><pre>'2.5.2'</pre></div>
+            </div>
+          </div>
+
+          <h3>One qubit, one gate</h3>
+          <p>A <code>QuantumCircuit</code> holds qubits and the gates applied to them, in order. Gates are methods: <code>qc.h(0)</code> means "Hadamard on qubit 0". <code>draw()</code> prints the diagram.</p>
+          <div class="nb">
+            <div class="cell">
+              <div class="pr in">In [2]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="kw">from</span> qiskit <span class="kw">import</span> QuantumCircuit
+
+qc = QuantumCircuit(<span class="nu">1</span>)          <span class="cm"># one qubit, starts in |0⟩</span>
+qc.h(<span class="nu">0</span>)
+<span class="fn">print</span>(qc.draw())</code></pre></div>
+              <div class="res"><div class="pr out"></div><pre>   ┌───┐
+q: ┤ H ├
+   └───┘</pre></div>
+            </div>
+            <div class="cell">
+              <div class="pr in">In [3]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="kw">from</span> qiskit.quantum_info <span class="kw">import</span> Statevector
+
+sv = Statevector(qc)          <span class="cm"># the amplitudes, exactly (lesson 1)</span>
+<span class="fn">print</span>(sv)
+<span class="fn">print</span>(sv.probabilities())     <span class="cm"># |amplitude|² for each outcome</span></code></pre></div>
+              <div class="res"><div class="pr out"></div><pre>Statevector([0.70710678+0.j, 0.70710678+0.j],
+            dims=(2,))
+[0.5 0.5]</pre></div>
+            </div>
+            <div class="cell">
+              <div class="pr in">In [4]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="kw">from</span> qiskit.quantum_info <span class="kw">import</span> Operator
+
+Operator(qc).data.round(<span class="nu">3</span>)    <span class="cm"># the matrix the circuit applies (lesson 5)</span></code></pre></div>
+              <div class="res"><div class="pr out">Out[4]:</div><pre>array([[ 0.707+0.j,  0.707+0.j],
+       [ 0.707+0.j, -0.707+0.j]])</pre></div>
+            </div>
+          </div>
+          <p><code>Statevector</code> and <code>Operator</code> are simulator shortcuts. They hand you the amplitudes and the matrix directly, which no real device can do. Use them to check your understanding; use shots, below, to see what an experiment sees.</p>
+
+          <h3>The Bell pair, with measurement</h3>
+          <div class="nb">
+            <div class="cell">
+              <div class="pr in">In [5]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code>bell = QuantumCircuit(<span class="nu">2</span>, <span class="nu">2</span>)      <span class="cm"># 2 qubits, 2 classical bits for results</span>
+bell.h(<span class="nu">0</span>)                    <span class="cm"># superposition on qubit 0</span>
+bell.cx(<span class="nu">0</span>, <span class="nu">1</span>)                <span class="cm"># CNOT: control 0, target 1</span>
+bell.measure([<span class="nu">0</span>, <span class="nu">1</span>], [<span class="nu">0</span>, <span class="nu">1</span>])  <span class="cm"># qubit i → classical bit i</span>
+<span class="fn">print</span>(bell.draw())</code></pre></div>
+              <div class="res"><div class="pr out"></div><pre>     ┌───┐     ┌─┐
+q_0: ┤ H ├──■──┤M├───
+     └───┘┌─┴─┐└╥┘┌─┐
+q_1: ─────┤ X ├─╫─┤M├
+          └───┘ ║ └╥┘
+c: 2/═══════════╩══╩═
+                0  1</pre></div>
+            </div>
+            <div class="cell">
+              <div class="pr in">In [6]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="kw">from</span> qiskit_aer <span class="kw">import</span> AerSimulator
+
+sim = AerSimulator()
+job = sim.run(bell, shots=<span class="nu">1024</span>)
+counts = job.result().get_counts()
+counts</code></pre></div>
+              <div class="res"><div class="pr out">Out[6]:</div><pre>{'11': 521, '00': 503}</pre></div>
+            </div>
+            <div class="cell">
+              <div class="pr in">In [7]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code>total = <span class="fn">sum</span>(counts.values())
+<span class="kw">for</span> outcome <span class="kw">in</span> <span class="fn">sorted</span>(counts):
+    n = counts[outcome]
+    <span class="fn">print</span>(<span class="st">f"{outcome}  {'█' * round(n / total * 40):&lt;40} {n:&gt;5}  {n/total:6.1%}"</span>)</code></pre></div>
+              <div class="res"><div class="pr out"></div><pre>00  ████████████████████                       503   49.1%
+11  ████████████████████                       521   50.9%</pre></div>
+            </div>
+          </div>
+          <p><code>01</code> and <code>10</code> never appear. That absence is the entanglement from lesson 8, and it is the shortest experiment that shows something no classical two-bit register does. Your counts will differ from these by a few dozen either way, for the reason in lesson 6.</p>
+
+          <div class="def">
+            <h4>Convention</h4>
+            <p><strong>Bit order.</strong> Qiskit prints classical bits with bit 0 on the <em>right</em>. A count key of <code>'10'</code> means qubit 1 read 1 and qubit 0 read 0. Textbooks usually write qubit 0 on the left. Most confusion in the first week of Qiskit is this one convention.</p>
+          </div>
+
+          <h3>The interference circuit from lesson 9</h3>
+          <p>A <code>Parameter</code> is a placeholder you fill in later, so one circuit can be run at many angles. <code>p(φ, 0)</code> is the phase gate: it multiplies the <code>|1⟩</code> amplitude by <code>e^{iφ}</code>.</p>
+          <div class="nb">
+            <div class="cell">
+              <div class="pr in">In [8]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> qiskit.circuit <span class="kw">import</span> Parameter
+
+phi = Parameter(<span class="st">"φ"</span>)
+mz = QuantumCircuit(<span class="nu">1</span>, <span class="nu">1</span>)
+mz.h(<span class="nu">0</span>)
+mz.p(phi, <span class="nu">0</span>)
+mz.h(<span class="nu">0</span>)
+mz.measure(<span class="nu">0</span>, <span class="nu">0</span>)
+<span class="fn">print</span>(mz.draw())
+
+<span class="kw">for</span> deg <span class="kw">in</span> (<span class="nu">0</span>, <span class="nu">90</span>, <span class="nu">180</span>):
+    bound = mz.assign_parameters({phi: np.deg2rad(deg)})
+    <span class="fn">print</span>(deg, sim.run(bound, shots=<span class="nu">1000</span>).result().get_counts())</code></pre></div>
+              <div class="res"><div class="pr out"></div><pre>     ┌───┐┌──────┐┌───┐┌─┐
+  q: ┤ H ├┤ P(φ) ├┤ H ├┤M├
+     └───┘└──────┘└───┘└╥┘
+c: 1/═══════════════════╩═
+                        0
+0 {'0': 1000}
+90 {'1': 503, '0': 497}
+180 {'1': 1000}</pre></div>
+            </div>
+          </div>
+          <p>Compare with the slider in lesson 9: <code>P(0) = cos²(φ/2)</code>, so 1, 0.5, 0. At 180° the answer is 1 every single time. A coin cannot do that.</p>
+
+          <h3>What the hardware actually runs</h3>
+          <p>A chip does not have an <code>H</code> gate. It has a small native set, and <code>transpile</code> rewrites your circuit into it. Depth and the number of two-qubit gates after transpilation are the numbers that matter, for the reasons in lesson 11.</p>
+          <div class="nb">
+            <div class="cell">
+              <div class="pr in">In [9]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="kw">from</span> qiskit <span class="kw">import</span> transpile
+
+native = transpile(bell, basis_gates=[<span class="st">"rz"</span>, <span class="st">"sx"</span>, <span class="st">"x"</span>, <span class="st">"cx"</span>], optimization_level=<span class="nu">1</span>)
+<span class="fn">print</span>(native.draw())
+<span class="fn">print</span>(<span class="st">"depth"</span>, native.depth(), <span class="st">"ops"</span>, <span class="fn">dict</span>(native.count_ops()))</code></pre></div>
+              <div class="res"><div class="pr out"></div><pre>global phase: π/4
+     ┌─────────┐┌────┐┌─────────┐     ┌─┐
+q_0: ┤ Rz(π/2) ├┤ √X ├┤ Rz(π/2) ├──■──┤M├───
+     └─────────┘└────┘└─────────┘┌─┴─┐└╥┘┌─┐
+q_1: ────────────────────────────┤ X ├─╫─┤M├
+                                 └───┘ ║ └╥┘
+c: 2/══════════════════════════════════╩══╩═
+                                       0  1
+depth 5 ops {'rz': 2, 'measure': 2, 'sx': 1, 'cx': 1}</pre></div>
+            </div>
+            <div class="cell">
+              <div class="pr in">In [10]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="kw">from</span> qiskit_aer.noise <span class="kw">import</span> NoiseModel, depolarizing_error
+
+noise = NoiseModel()
+noise.add_all_qubit_quantum_error(depolarizing_error(<span class="nu">0.02</span>, <span class="nu">2</span>), [<span class="st">"cx"</span>])
+noise.add_all_qubit_quantum_error(depolarizing_error(<span class="nu">0.002</span>, <span class="nu">1</span>), [<span class="st">"sx"</span>, <span class="st">"x"</span>, <span class="st">"rz"</span>])
+
+noisy = AerSimulator(noise_model=noise)
+noisy.run(native, shots=<span class="nu">1024</span>).result().get_counts()</code></pre></div>
+              <div class="res"><div class="pr out">Out[10]:</div><pre>{'11': 510, '00': 505, '01': 7, '10': 2}</pre></div>
+            </div>
+          </div>
+          <p>Nine bad shots out of 1024 from a 2% two-qubit error rate. A circuit with a hundred CNOTs would be mostly noise. That is lesson 11 in one line of output.</p>
+
+          <h3>The same job on a real device</h3>
+          <p>Swap the simulator for a backend. Everything before this cell stays the same. This cell is not run here: it needs a free IBM Quantum account and a queue, and the result is yours to compare with cell 6.</p>
+          <div class="nb">
+            <div class="cell">
+              <div class="pr in">In [ ]:</div>
+              <div class="src"><button class="mini copy" type="button">copy</button><pre><code><span class="cm"># pip install qiskit-ibm-runtime</span>
+<span class="kw">from</span> qiskit_ibm_runtime <span class="kw">import</span> QiskitRuntimeService, SamplerV2 <span class="kw">as</span> Sampler
+<span class="kw">from</span> qiskit.transpiler <span class="kw">import</span> generate_preset_pass_manager
+
+service = QiskitRuntimeService()      <span class="cm"># after a one-time service.save_account(token=...)</span>
+backend = service.least_busy(operational=<span class="kw">True</span>, simulator=<span class="kw">False</span>)
+
+pm = generate_preset_pass_manager(backend=backend, optimization_level=<span class="nu">1</span>)
+isa = pm.run(bell)                    <span class="cm"># rewrite for this chip's gates and layout</span>
+
+job = Sampler(mode=backend).run([isa], shots=<span class="nu">1024</span>)
+<span class="fn">print</span>(backend.name, job.job_id())
+<span class="fn">print</span>(job.result()[<span class="nu">0</span>].data.c.get_counts())</code></pre></div>
+              <div class="res"><div class="pr out"></div><pre class="note">not run. Expect a few minutes in the queue, then counts with a few percent of 01 and 10, from real noise instead of the modelled kind.</pre></div>
+            </div>
+          </div>
+
+          <div class="btns" style="margin-top:8px;align-items:center"><button class="b" type="button" id="nbDownload">download notebook (.json)</button><span class="small">rename it to .ipynb and Jupyter opens it</span></div>
+
+          <p>Most of the code around a quantum program is classical: building the circuit, transpiling it, batching shots, and fitting the results. The quantum part is a subroutine called from ordinary software, and the cells above are the whole of that subroutine.</p>
+
+          <div class="exercises">
+            <h3>Exercises</h3>
+            <ol>
+              <li><div>
+                <p class="q">Change cell 5 so the CNOT runs before the H. Predict the counts, then run it.</p>
+                <details><summary>answer</summary><div class="inner"><p>Control is <code>|0⟩</code> when the CNOT fires, so it does nothing; then H puts qubit 0 in superposition alone. Counts: about half <code>'00'</code>, half <code>'01'</code>. No entanglement, matching the second exercise of lesson 8.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Add <code>bell.x(1)</code> before the measurement. Which two keys appear now?</p>
+                <details><summary>answer</summary><div class="inner"><p><code>'10'</code> and <code>'01'</code>. Flipping qubit 1 turns <code>(|00⟩+|11⟩)/√2</code> into <code>(|10⟩+|01⟩)/√2</code>, written in Qiskit's bit order. Still entangled, still perfectly anti-correlated.</p></div></details>
+              </div></li>
+              <li><div>
+                <p class="q">Raise the CNOT error in cell 10 to 0.2. Roughly what fraction of shots come out wrong?</p>
+                <details><summary>answer</summary><div class="inner"><p>About 10%. Depolarising error with parameter 0.2 replaces 20% of shots with a uniformly random outcome. Half of random two-bit outcomes are <code>01</code> or <code>10</code>, so about <code>0.2 × 1/2 = 10%</code> come out wrong, plus a little from the single-qubit gates. Check: 20,000 shots gave 10.7%.</p></div></details>
+              </div></li>
+            </ol>
+          </div>
+
+          <div class="doneline"><input type="checkbox" id="d10"><label for="d10">mark lesson 10 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 11 ================= -->
+      <section class="lesson" id="l11" data-title="Noise">
+        <div class="lhead">
+          <div class="lnum">11</div>
+          <h2>Noise, and why the machines are not ready</h2>
+          <p class="goal">By the end: you can explain what limits circuit depth and what error correction buys.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <p>The same coupling that lets you control a qubit lets its state leak into the environment. Two timescales describe the damage.</p>
+          <table>
+            <tbody>
+              <tr><td class="m">T₁</td><td><strong>Relaxation.</strong> <code>|1⟩</code> decays toward <code>|0⟩</code> as energy leaves the qubit.</td></tr>
+              <tr><td class="m">T₂</td><td><strong>Dephasing.</strong> The relative phase φ randomises. On the Bloch sphere the arrow spirals inward toward the z axis. Interference dies with it, and T₂ is usually the binding constraint.</td></tr>
+              <tr><td class="m">gate error</td><td>Around 10⁻³ to 10⁻⁴ per two-qubit gate on good hardware. A useful algorithm may need a billion gates.</td></tr>
+              <tr><td class="m">readout error</td><td>Measurement itself misreports at around the percent level.</td></tr>
+            </tbody>
+          </table>
+          <p>Put those together and the conclusion is uncomfortable: a circuit deep enough to be useful is deeper than coherence currently allows. Qubit count is not the barrier. Depth is. The present era has a name, NISQ, for noisy intermediate-scale quantum.</p>
+
+          <h3>Error correction, in one idea</h3>
+          <p>You cannot copy a qubit and you cannot look at one without destroying it. But you can spread a single <strong>logical</strong> qubit across many <strong>physical</strong> ones and measure <em>parities</em>: questions of the form "did these two disagree?". A parity reveals that an error occurred without revealing the state, so you can correct it without collapsing anything.</p>
+          <p>The <strong>threshold theorem</strong> says that if the physical error rate is below roughly one percent, adding more physical qubits drives the logical error rate down exponentially. Correction works in principle. It is expensive in practice: current surface-code estimates run near a thousand physical qubits per logical one, which is why factoring a real RSA key needs millions of physical qubits.</p>
+
+          <table>
+            <thead><tr><th>Hardware</th><th>Trade-off</th></tr></thead>
+            <tbody>
+              <tr><td class="m">superconducting</td><td>fast gates, chip fabrication; needs millikelvin cooling, short coherence</td></tr>
+              <tr><td class="m">trapped ion</td><td>excellent fidelity, any qubit can talk to any other; gates are slow</td></tr>
+              <tr><td class="m">neutral atom</td><td>thousands of atoms, reconfigurable geometry; a younger technology</td></tr>
+              <tr><td class="m">photonic</td><td>room temperature, natural for networking; two-qubit gates are probabilistic</td></tr>
+            </tbody>
+          </table>
+
+          <div class="doneline"><input type="checkbox" id="d11"><label for="d11">mark lesson 11 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 12 ================= -->
+      <section class="lesson" id="l12" data-title="Algorithms">
+        <div class="lhead">
+          <div class="lnum">12</div>
+          <h2>What the speedups actually are</h2>
+          <p class="goal">By the end: you can tell a proven speedup from a hoped-for one.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <table>
+            <thead><tr><th>Algorithm</th><th>Speedup</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td class="m">Deutsch–Jozsa</td><td>exponential, in queries</td><td>a teaching problem, but the cleanest proof that something is going on</td></tr>
+              <tr><td class="m">Grover</td><td>quadratic, √N</td><td>proven, and proven optimal for unstructured search</td></tr>
+              <tr><td class="m">Shor</td><td>exponential</td><td>breaks RSA and elliptic-curve cryptography; needs fault tolerance</td></tr>
+              <tr><td class="m">phase estimation</td><td>the subroutine</td><td>sits inside Shor and inside most chemistry algorithms</td></tr>
+              <tr><td class="m">Hamiltonian simulation</td><td>exponential</td><td>the strongest practical case, and the original motivation</td></tr>
+              <tr><td class="m">HHL, linear systems</td><td>exponential, with caveats</td><td>the caveats on loading data in and reading answers out are severe</td></tr>
+              <tr><td class="m">VQE, QAOA</td><td>unknown</td><td>heuristics designed for noisy hardware; no proven advantage</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Four things to hold onto</h3>
+          <ul>
+            <li><strong>NP-complete problems are not solved by quantum computers.</strong> Grover turns <code>2ⁿ</code> into <code>2^(n/2)</code>, which is real and still exponential. There is no known quantum polynomial-time algorithm for SAT, and good reason to doubt one exists.</li>
+            <li><strong>Speedups need structure.</strong> Shor works because factoring hides a period. Without exploitable structure, expect nothing better than Grover.</li>
+            <li><strong>Loading data can eat the advantage.</strong> An algorithm that needs a large classical dataset written into amplitudes may spend its entire speedup on the writing.</li>
+            <li><strong>Classical algorithms fight back.</strong> Several claimed quantum advantages have been dequantised, meaning someone found a classical method nearly as fast. Always ask what the best classical algorithm does, not the naive one.</li>
+          </ul>
+
+          <div class="doneline"><input type="checkbox" id="d12"><label for="d12">mark lesson 12 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 13 ================= -->
+      <section class="lesson" id="l13" data-title="Self-test">
+        <div class="lhead">
+          <div class="lnum">13</div>
+          <h2>Self-test</h2>
+          <p class="goal">Ten questions. Answer them all, then check. Anything you miss points at the lesson to reread.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <div class="quiz" id="quiz"></div>
+          <div class="btns" style="margin-top:16px">
+            <button class="b" type="button" id="quizCheck">check answers</button>
+            <button class="b" type="button" id="quizReset">clear</button>
+          </div>
+          <p class="score" id="quizScore"></p>
+          <div class="doneline"><input type="checkbox" id="d13"><label for="d13">mark lesson 13 done</label></div>
+        </div></div>
+      </section>
+
+      <!-- ================= 14 ================= -->
+      <section class="lesson" id="l14" data-title="What comes next">
+        <div class="lhead">
+          <div class="lnum">14</div>
+          <h2>What to learn next</h2>
+          <p class="goal">Four topics, in the order that keeps making sense.</p>
+        </div>
+        <div class="lbody"><div class="col">
+          <table>
+            <tbody>
+              <tr><td class="m">density matrices</td><td>The full state language: mixed states, partial trace, noise as a channel. Everything past the ideal qubit needs it, including the shrinking arrow in lesson 8.</td></tr>
+              <tr><td class="m">QFT and phase estimation</td><td>The bridge from toy circuits to Shor. Phase estimation is the single most reused subroutine in the field.</td></tr>
+              <tr><td class="m">Grover, by hand</td><td>The clearest place to watch amplitude amplification work, iteration by iteration. Also the clearest place to see it stop working if you iterate too many times.</td></tr>
+              <tr><td class="m">stabiliser formalism</td><td>Clifford gates, the surface code, and why T gates are the expensive ones in a fault-tolerant machine.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Four things to actually build</h3>
+          <ol class="plain">
+            <li>Build the Bell pair in Qiskit and confirm that <code>01</code> and <code>10</code> never appear.</li>
+            <li>Implement Deutsch–Jozsa on two qubits starting from the matrices, without copying a tutorial.</li>
+            <li>Run one circuit on a simulator and on real hardware, and compare the histograms. The gap is lesson 11 made visible.</li>
+            <li>Write Grover for three qubits and plot success probability against iteration count. Watch it rise, peak, and come back down.</li>
+          </ol>
+
+          <h3>Where to read further</h3>
+          <table>
+            <tbody>
+              <tr><td class="m">textbook</td><td>Nielsen and Chuang, <em>Quantum Computation and Quantum Information</em>. Still the standard, and readable if you do the exercises.</td></tr>
+              <tr><td class="m">intuition</td><td>Quantum Country, by Matuschak and Nielsen. Essays with spaced repetition built in.</td></tr>
+              <tr><td class="m">hands-on</td><td>IBM Quantum Learning and the Qiskit documentation, with free access to real devices.</td></tr>
+              <tr><td class="m">rigour</td><td>Preskill's Caltech lecture notes; Watrous, <em>The Theory of Quantum Information</em>.</td></tr>
+              <tr><td class="m">skepticism</td><td>Scott Aaronson's blog, for calibrating claims you read in the press.</td></tr>
+            </tbody>
+          </table>
+
+          <p class="small">Two habits worth forming early. Write out the matrices by hand whenever you do not believe a claim. And check every advertised speedup against the best classical algorithm, not the obvious one.</p>
+
+          <div class="doneline"><input type="checkbox" id="d14"><label for="d14">mark lesson 14 done</label></div>
+        </div></div>
+      </section>
+    </article>
+  </main>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $ = function(s,r){return (r||document).querySelector(s);};
+var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+var TAU = Math.PI*2;
+var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- complex + qubit math ---------- */
+function cx(re,im){return {re:re||0,im:im||0};}
+function cmul(p,q){return cx(p.re*q.re-p.im*q.im, p.re*q.im+p.im*q.re);}
+function cadd(p,q){return cx(p.re+q.re,p.im+q.im);}
+function cabs2(p){return p.re*p.re+p.im*p.im;}
+function rotMatrix(n,angle){
+  var c=Math.cos(angle/2), s=Math.sin(angle/2);
+  return [cx(c,-s*n[2]), cx(-s*n[1],-s*n[0]), cx(s*n[1],-s*n[0]), cx(c,s*n[2])];
+}
+function applyM(m,st){
+  return {a:cadd(cmul(m[0],st.a),cmul(m[1],st.b)), b:cadd(cmul(m[2],st.a),cmul(m[3],st.b))};
+}
+function blochOf(st){
+  var ar=st.a.re,ai=st.a.im,br=st.b.re,bi=st.b.im;
+  return [2*(ar*br+ai*bi), 2*(ar*bi-ai*br), ar*ar+ai*ai-(br*br+bi*bi)];
+}
+function norm(v){return Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);}
+var SQ = 1/Math.SQRT2;
+var GATES = {
+  X:{n:[1,0,0],a:Math.PI}, Y:{n:[0,1,0],a:Math.PI}, Z:{n:[0,0,1],a:Math.PI},
+  H:{n:[SQ,0,SQ],a:Math.PI}, S:{n:[0,0,1],a:Math.PI/2}, T:{n:[0,0,1],a:Math.PI/4}
+};
+
+/* ---------- drawing helpers ---------- */
+function colors(){
+  var cs=getComputedStyle(document.documentElement);
+  return {ink:cs.getPropertyValue("--sphere-ink").trim(), zero:cs.getPropertyValue("--zero").trim(),
+          one:cs.getPropertyValue("--one").trim(), phase:cs.getPropertyValue("--phase").trim(),
+          muted:cs.getPropertyValue("--muted").trim()};
+}
+function rgb(h){h=h.replace("#","");if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];var n=parseInt(h,16);return [(n>>16)&255,(n>>8)&255,n&255];}
+function alpha(h,a){var c=rgb(h);return "rgba("+c[0]+","+c[1]+","+c[2]+","+a+")";}
+function mix(h1,h2,t){var a=rgb(h1),b=rgb(h2);return "rgb("+Math.round(a[0]+(b[0]-a[0])*t)+","+Math.round(a[1]+(b[1]-a[1])*t)+","+Math.round(a[2]+(b[2]-a[2])*t)+")";}
+
+var spheres=[];
+function Bloch(canvas,opts){
+  opts=opts||{};
+  this.c=canvas; this.ctx=canvas.getContext("2d");
+  this.yaw=-2.0; this.pitch=0.4; this.v=[0,0,1]; this.trail=[];
+  this.compact=!!opts.compact;
+  var self=this, dragging=false, lx=0, ly=0;
+  canvas.addEventListener("pointerdown",function(e){dragging=true;lx=e.clientX;ly=e.clientY;canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener("pointermove",function(e){
+    if(!dragging)return;
+    self.yaw+=(e.clientX-lx)*0.01;
+    self.pitch=Math.max(-1.3,Math.min(1.3,self.pitch+(e.clientY-ly)*0.01));
+    lx=e.clientX; ly=e.clientY; self.draw();
+  });
+  function stop(e){dragging=false;try{canvas.releasePointerCapture(e.pointerId);}catch(err){}}
+  canvas.addEventListener("pointerup",stop);
+  canvas.addEventListener("pointercancel",stop);
+  spheres.push(this);
+}
+Bloch.prototype.setVec=function(v,trail){
+  if(trail){this.trail.push(this.v.slice()); if(this.trail.length>44)this.trail.shift();}
+  this.v=v; this.draw();
+};
+Bloch.prototype.clearTrail=function(){this.trail=[];};
+Bloch.prototype.resize=function(){
+  var r=this.c.getBoundingClientRect();
+  if(!r.width||!r.height)return;
+  var d=Math.min(window.devicePixelRatio||1,2);
+  this.c.width=Math.round(r.width*d); this.c.height=Math.round(r.height*d);
+  this.ctx.setTransform(d,0,0,d,0,0);
+  this.w=r.width; this.h=r.height;
+  this.R=Math.min(r.width,r.height)*0.33;
+  this.draw();
+};
+Bloch.prototype.proj=function(p){
+  var cy=Math.cos(this.yaw), sy=Math.sin(this.yaw);
+  var x1=p[0]*cy-p[1]*sy, y1=-(p[0]*sy+p[1]*cy), z1=p[2];
+  var cp=Math.cos(this.pitch), sp=Math.sin(this.pitch);
+  return {x:this.w/2+x1*this.R, y:this.h/2-(z1*cp-y1*sp)*this.R, d:y1*cp+z1*sp};
+};
+Bloch.prototype.ring=function(fn,front){
+  var ctx=this.ctx, started=false;
+  ctx.beginPath();
+  for(var i=0;i<=96;i++){
+    var q=this.proj(fn(i/96*TAU));
+    var vis = front ? q.d>=0 : q.d<0;
+    if(!vis){started=false;continue;}
+    if(!started){ctx.moveTo(q.x,q.y);started=true;} else ctx.lineTo(q.x,q.y);
+  }
+  ctx.stroke();
+};
+Bloch.prototype.spoke=function(dir,front){
+  var b=this.proj(dir);
+  if((b.d>=0)!==front)return;
+  var o=this.proj([0,0,0]);
+  var ctx=this.ctx;
+  ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+};
+Bloch.prototype.draw=function(){
+  if(!this.w)return;
+  var ctx=this.ctx, C=colors(), R=this.R, self=this;
+  ctx.clearRect(0,0,this.w,this.h);
+  var eq=function(t){return [Math.cos(t),Math.sin(t),0];};
+  var mx=function(t){return [Math.cos(t),0,Math.sin(t)];};
+  var my=function(t){return [0,Math.cos(t),Math.sin(t)];};
+  var axes=[[1.04,0,0],[-1.04,0,0],[0,1.04,0],[0,-1.04,0],[0,0,1.04],[0,0,-1.04]];
+
+  ctx.lineWidth=1;
+  ctx.setLineDash([2,4]);
+  ctx.strokeStyle=alpha(C.ink,0.14);
+  this.ring(eq,false); this.ring(mx,false); this.ring(my,false);
+  axes.forEach(function(a){self.spoke(a,false);});
+  ctx.setLineDash([]);
+
+  ctx.beginPath();
+  ctx.arc(this.w/2,this.h/2,R,0,TAU);
+  ctx.strokeStyle=alpha(C.ink,0.24);
+  ctx.stroke();
+
+  if(this.trail.length>1){
+    for(var i=1;i<this.trail.length;i++){
+      var p=this.proj(this.trail[i-1]), q=this.proj(this.trail[i]);
+      ctx.beginPath();
+      ctx.strokeStyle=alpha(C.phase,0.12+0.55*(i/this.trail.length));
+      ctx.lineWidth=1.6;
+      ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
+    }
+  }
+
+  ctx.lineWidth=1;
+  ctx.strokeStyle=alpha(C.ink,0.3);
+  this.ring(eq,true);
+  ctx.strokeStyle=alpha(C.ink,0.15);
+  this.ring(mx,true); this.ring(my,true);
+  ctx.strokeStyle=alpha(C.ink,0.3);
+  axes.forEach(function(a){self.spoke(a,true);});
+
+  ctx.font="500 "+(this.compact?11.5:13)+"px 'IBM Plex Mono', monospace";
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  var put=function(p,txt,col){var q=self.proj(p);ctx.fillStyle=col;ctx.fillText(txt,q.x,q.y);};
+  put([0,0,1.2],"|0⟩",C.zero);
+  put([0,0,-1.2],"|1⟩",C.one);
+  if(!this.compact){
+    put([1.22,0,0],"|+⟩",alpha(C.ink,0.45));
+    put([-1.26,0,0],"|−⟩",alpha(C.ink,0.45));
+    put([0,1.24,0],"|+i⟩",alpha(C.ink,0.45));
+    put([0,-1.28,0],"|−i⟩",alpha(C.ink,0.45));
+  }
+
+  var len=norm(this.v);
+  var o=this.proj([0,0,0]), tip=this.proj(this.v);
+  var t=Math.max(0,Math.min(1,(1-(len>0?this.v[2]/Math.max(len,1e-9):0))/2));
+  var col=mix(C.zero,C.one,t);
+
+  ctx.setLineDash([2,4]); ctx.lineWidth=1; ctx.strokeStyle=alpha(C.ink,0.28);
+  var foot=this.proj([this.v[0],this.v[1],0]);
+  ctx.beginPath();ctx.moveTo(tip.x,tip.y);ctx.lineTo(foot.x,foot.y);ctx.moveTo(foot.x,foot.y);ctx.lineTo(o.x,o.y);ctx.stroke();
+  ctx.setLineDash([]);
+
+  if(len>0.02){
+    ctx.strokeStyle=col; ctx.lineWidth=2.6; ctx.lineCap="round";
+    ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(tip.x,tip.y);ctx.stroke();
+    var ang=Math.atan2(tip.y-o.y,tip.x-o.x), hs=this.compact?7:8.5;
+    ctx.beginPath();
+    ctx.moveTo(tip.x,tip.y);
+    ctx.lineTo(tip.x-hs*Math.cos(ang-0.42),tip.y-hs*Math.sin(ang-0.42));
+    ctx.lineTo(tip.x-hs*Math.cos(ang+0.42),tip.y-hs*Math.sin(ang+0.42));
+    ctx.closePath(); ctx.fillStyle=col; ctx.fill();
+  } else {
+    ctx.beginPath();ctx.arc(o.x,o.y,5,0,TAU);ctx.strokeStyle=C.one;ctx.lineWidth=1.4;ctx.stroke();
+  }
+  ctx.beginPath();ctx.arc(o.x,o.y,2.2,0,TAU);ctx.fillStyle=alpha(C.ink,0.5);ctx.fill();
+};
+
+var deg=function(r){return r*180/Math.PI;};
+var rad=function(d){return d*Math.PI/180;};
+function fmt(x){return (Math.abs(x)<5e-4?0:x).toFixed(3);}
+function ketName(theta,phi){
+  var t=Math.round(deg(theta)), p=((Math.round(deg(phi))%360)+360)%360;
+  if(t<1)return "|0⟩";
+  if(t>179)return "|1⟩";
+  if(Math.abs(t-90)<1){
+    if(p<1||p>359)return "|+⟩";
+    if(Math.abs(p-180)<1)return "|−⟩";
+    if(Math.abs(p-90)<1)return "|+i⟩";
+    if(Math.abs(p-270)<1)return "|−i⟩";
+  }
+  return "θ "+t+"°, φ "+p+"°";
+}
+
+/* ---------- lesson 4: explorer ---------- */
+var expSphere=new Bloch($("#cvExplore"));
+(function(){
+  var thSl=$("#thSl"), phSl=$("#phSl");
+  function update(){
+    var th=rad(+thSl.value), ph=rad(+phSl.value);
+    $("#thOut").textContent=thSl.value+"°";
+    $("#phOut").textContent=phSl.value+"°";
+    var a=Math.cos(th/2), s=Math.sin(th/2);
+    var br=s*Math.cos(ph), bi=s*Math.sin(ph);
+    $("#rAlpha").textContent=fmt(a);
+    $("#rBeta").textContent=fmt(br)+(bi<0?" − ":" + ")+fmt(Math.abs(bi))+"i";
+    $("#rP0").textContent=(a*a*100).toFixed(1)+"%";
+    $("#rP1").textContent=(s*s*100).toFixed(1)+"%";
+    $("#expName").textContent=ketName(th,ph);
+    expSphere.setVec([Math.sin(th)*Math.cos(ph),Math.sin(th)*Math.sin(ph),Math.cos(th)]);
+  }
+  thSl.addEventListener("input",update);
+  phSl.addEventListener("input",update);
+  $$("#presets button").forEach(function(b){
+    b.addEventListener("click",function(){thSl.value=b.dataset.t;phSl.value=b.dataset.p;update();});
+  });
+  update();
+})();
+
+/* ---------- lesson 5: gate lab ---------- */
+var gateSphere=new Bloch($("#cvGate"));
+(function(){
+  var state={a:cx(1,0),b:cx(0,0)};
+  var history=[], busy=false, usedX=false, hitMinus=false;
+  var tape=$("#tape");
+  var tasks=$$("#tasks li");
+
+  function checkTasks(){
+    var v=blochOf(state);
+    tasks.forEach(function(li,i){
+      if(li.classList.contains("solved"))return;
+      var tg=li.dataset.target.split(",").map(Number);
+      var near=Math.abs(v[0]-tg[0])<0.02&&Math.abs(v[1]-tg[1])<0.02&&Math.abs(v[2]-tg[2])<0.02;
+      if(!near)return;
+      if(i===0&&history.length!==1)return;
+      if(i===1&&history.length>2===false&&history.length!==2)return;
+      if(i===2&&usedX)return;
+      if(i===3)return;
+      li.classList.add("solved"); li.querySelector(".mk").textContent="";
+    });
+    // task 4: reached |-> at some point, now back at |0>
+    if(Math.abs(v[0]+1)<0.02&&Math.abs(v[1])<0.02&&Math.abs(v[2])<0.02) hitMinus=true;
+    var t4=tasks[3];
+    if(hitMinus&&!t4.classList.contains("solved")&&v[2]>0.98&&history.length>1){
+      t4.classList.add("solved"); t4.querySelector(".mk").textContent="";
+    }
+  }
+  function readout(){
+    var v=blochOf(state);
+    var th=Math.acos(Math.max(-1,Math.min(1,v[2])));
+    var ph=Math.atan2(v[1],v[0]); if(ph<0)ph+=TAU;
+    var flat=Math.sin(th)<1e-6;
+    $("#gTheta").textContent=deg(th).toFixed(1)+"°";
+    $("#gPhi").textContent=(flat?0:deg(ph)).toFixed(1)+"°";
+    var p0=cabs2(state.a);
+    $("#gP0").textContent=(p0*100).toFixed(1)+"%";
+    $("#gP1").textContent=((1-p0)*100).toFixed(1)+"%";
+    $("#gateStateName").textContent=ketName(th,flat?0:ph);
+    checkTasks();
+  }
+  function renderTape(){
+    if(!history.length){tape.innerHTML='<span class="e">|0⟩ with no gates applied</span>';return;}
+    tape.innerHTML='<span class="e">|0⟩ </span>'+history.map(function(g){return '<span class="g">'+g+'</span>';}).join("");
+  }
+  function run(n,angle,label){
+    if(busy)return;
+    if(label==="X")usedX=true;
+    history.push(label); if(history.length>14)history.shift();
+    renderTape();
+    var start=state;
+    function finish(){
+      state=applyM(rotMatrix(n,angle),start);
+      gateSphere.setVec(blochOf(state),true);
+      readout(); busy=false;
+    }
+    if(reduceMotion){finish();return;}
+    busy=true;
+    gateSphere.clearTrail();
+    var t0=performance.now(), dur=400;
+    (function step(now){
+      var k=Math.min(1,(now-t0)/dur);
+      var e=k<0.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      gateSphere.setVec(blochOf(applyM(rotMatrix(n,angle*e),start)),true);
+      if(k<1)requestAnimationFrame(step); else finish();
+    })(performance.now());
+  }
+  $$("#gateRow button").forEach(function(b){
+    b.addEventListener("click",function(){var g=GATES[b.dataset.g];run(g.n,g.a,b.dataset.g);});
+  });
+  $$("#rotRow button[data-r]").forEach(function(b){
+    b.addEventListener("click",function(){
+      var ax=b.dataset.r;
+      var n= ax==="x"?[1,0,0]: ax==="y"?[0,1,0]:[0,0,1];
+      var a=+$("#rotSl").value;
+      run(n,rad(a),"R"+ax+"("+a+"°)");
+    });
+  });
+  $("#rotSl").addEventListener("input",function(){$("#rotOut").textContent=this.value+"°";});
+  $("#gateReset").addEventListener("click",function(){
+    state={a:cx(1,0),b:cx(0,0)}; history=[]; usedX=false; hitMinus=false;
+    gateSphere.clearTrail(); renderTape(); gateSphere.setVec([0,0,1]); readout();
+  });
+  gateSphere.setVec([0,0,1]); readout();
+})();
+
+/* ---------- lesson 6: shots ---------- */
+(function(){
+  var c0=0,c1=0,log=[];
+  var sl=$("#msTh");
+  function probs(){var th=rad(+sl.value);return [Math.pow(Math.cos(th/2),2),Math.pow(Math.sin(th/2),2)];}
+  function drawProbs(){
+    var p=probs();
+    $("#msThOut").textContent=sl.value+"°";
+    $("#msTh0").style.width=(p[0]*100)+"%";
+    $("#msTh1").style.width=(p[1]*100)+"%";
+    $("#msTh0v").textContent=(p[0]*100).toFixed(1)+"%";
+    $("#msTh1v").textContent=(p[1]*100).toFixed(1)+"%";
+  }
+  function drawCounts(){
+    var tot=c0+c1, m=Math.max(c0,c1,1);
+    $("#msC0").style.width=(c0/m*100)+"%";
+    $("#msC1").style.width=(c1/m*100)+"%";
+    $("#msC0v").textContent=tot?c0+" ("+(c0/tot*100).toFixed(1)+"%)":"0";
+    $("#msC1v").textContent=tot?c1+" ("+(c1/tot*100).toFixed(1)+"%)":"0";
+    $("#shotTotal").textContent=tot+(tot===1?" shot":" shots");
+    var el=$("#shotLog");
+    if(!log.length){el.innerHTML='<span class="e">no outcomes yet</span>';}
+    else{el.textContent=log.slice(-120).join(" ");}
+  }
+  function shoot(n){
+    var p=probs();
+    for(var i=0;i<n;i++){var r=Math.random()<p[0]?0:1; if(r===0)c0++;else c1++; log.push(r);}
+    if(log.length>400)log=log.slice(-400);
+    drawCounts();
+  }
+  sl.addEventListener("input",drawProbs);
+  $("#shot1").addEventListener("click",function(){shoot(1);});
+  $("#shot20").addEventListener("click",function(){shoot(20);});
+  $("#shot500").addEventListener("click",function(){shoot(500);});
+  $("#shotClear").addEventListener("click",function(){c0=0;c1=0;log=[];drawCounts();});
+  drawProbs(); drawCounts();
+})();
+
+/* ---------- lesson 8: bell ---------- */
+var bellSphere=new Bloch($("#cvBell"),{compact:true});
+(function(){
+  var flags={x:false,h:false,cx:false};
+  var fills=$$("#bellBars .fill"), vals=$$("#bellBars .n");
+  function build(){
+    var c=[cx(1,0),cx(0,0),cx(0,0),cx(0,0)];
+    function one(m){
+      var out=[cx(0,0),cx(0,0),cx(0,0),cx(0,0)];
+      for(var b=0;b<2;b++){
+        var a0=c[b], a1=c[2+b];
+        out[b]=cadd(cmul(m[0],a0),cmul(m[1],a1));
+        out[2+b]=cadd(cmul(m[2],a0),cmul(m[3],a1));
+      }
+      return out;
+    }
+    if(flags.x)c=one(rotMatrix([1,0,0],Math.PI));
+    if(flags.h)c=one(rotMatrix([SQ,0,SQ],Math.PI));
+    if(flags.cx){var t=c[2];c[2]=c[3];c[3]=t;}
+    return c;
+  }
+  function drawCircuit(){
+    var aLine="A: |0⟩ ──"+(flags.x?"[X]──":"")+(flags.h?"[H]──":"")+(flags.cx?"●──":"───");
+    var pad=6+(flags.x?5:0)+(flags.h?5:0);
+    var mid=flags.cx?new Array(pad+7).join(" ")+"│":"";
+    var bLine="B: |0⟩ ──"+new Array((flags.x?5:0)+(flags.h?5:0)+1).join(" ")+(flags.cx?"⊕──":"───");
+    $("#bellCircuit").textContent=aLine+"\n"+mid+"\n"+bLine;
+  }
+  function update(){
+    var c=build(), p=c.map(cabs2);
+    fills.forEach(function(f,i){
+      f.style.width=(p[i]*100)+"%";
+      if(i>=2)f.classList.add("o"); else f.classList.remove("o");
+      vals[i].textContent=(p[i]*100).toFixed(1)+"%";
+    });
+    var r00=p[0]+p[1], r11=p[2]+p[3], re=0, im=0;
+    for(var b=0;b<2;b++){
+      var u=c[b], w=c[2+b];
+      re+=u.re*w.re+u.im*w.im;
+      im+=u.im*w.re-u.re*w.im;
+    }
+    var v=[2*re,-2*im,r00-r11];
+    bellSphere.setVec(v);
+    var L=norm(v);
+    $("#bellPurity").textContent=L.toFixed(3);
+    $("#bellEnt").textContent= L<0.01?"maximal":(L>0.99?"none":"partial");
+    drawCircuit();
+  }
+  $$("#bellRow button").forEach(function(b){
+    b.addEventListener("click",function(){
+      var k=b.dataset.b;
+      if(k==="reset"){
+        flags.x=flags.h=flags.cx=false;
+        $$("#bellRow button[data-b]").forEach(function(o){if(o.dataset.b!=="reset")o.setAttribute("aria-pressed","false");});
+      } else {
+        flags[k]=!flags[k];
+        b.setAttribute("aria-pressed",flags[k]?"true":"false");
+      }
+      update();
+    });
+  });
+  update();
+})();
+
+/* ---------- lesson 9: interference ---------- */
+(function(){
+  var sl=$("#mzSl");
+  function update(){
+    var phi=rad(+sl.value);
+    var p0=Math.pow(Math.cos(phi/2),2), p1=1-p0;
+    $("#mzOut").textContent=sl.value+"°";
+    $("#mz0").style.width=(p0*100)+"%";
+    $("#mz1").style.width=(p1*100)+"%";
+    $("#mz0v").textContent=(p0*100).toFixed(1)+"%";
+    $("#mz1v").textContent=(p1*100).toFixed(1)+"%";
+    $("#mzTag").textContent= p0>0.98?"fully constructive": p0<0.02?"fully destructive":"partial";
+  }
+  sl.addEventListener("input",update);
+  update();
+})();
+
+/* ---------- lesson 13: quiz ---------- */
+(function(){
+  var QS=[
+    {q:"A state has amplitudes 1/√2 and −1/√2. What is the probability of the second outcome?",
+     o:["−50%","0%","50%","70.7%"],c:2,
+     e:"Probability is the squared magnitude: |−1/√2|² = 0.5. The minus sign never reaches the probability, but it matters the moment this state interferes with another."},
+    {q:"Which change to a state is physically undetectable?",
+     o:["Multiplying the whole state by e^{iγ}","Multiplying only the |1⟩ term by −1","Swapping α and β","Applying a T gate"],c:0,
+     e:"Global phase cancels in every probability, in every basis. Changing only one term is a relative phase, which is real and measurable."},
+    {q:"Two states are orthogonal. What follows?",
+     o:["They give the same measurement statistics","One measurement can distinguish them with certainty","They are 90° apart on the Bloch sphere","They cannot both be valid states"],c:1,
+     e:"Orthogonal means ⟨φ|ψ⟩ = 0, so a suitable single measurement separates them perfectly. On the Bloch sphere they sit at opposite poles, 180° apart."},
+    {q:"Where do all states with P(0) = 50% sit on the Bloch sphere?",
+     o:["At the north pole","At the centre","On the equator","Along the z axis"],c:2,
+     e:"θ = 90° is the equator. Those states differ from each other only in relative phase φ."},
+    {q:"Which gate never changes the measurement probabilities in the Z basis?",
+     o:["H","X","T","Ry(45°)"],c:2,
+     e:"T rotates about the z axis, so it changes φ only. θ, and therefore P(0), is untouched."},
+    {q:"You measure a qubit in superposition and get 0. You measure again immediately. What happens?",
+     o:["50/50 again","0 with certainty","The state returns to superposition","The qubit is destroyed"],c:1,
+     e:"The first measurement collapsed the state to |0⟩. Repeating it returns 0 forever, which is why one run tells you so little."},
+    {q:"Why can a single-qubit gate never create entanglement?",
+     o:["It is not unitary","It acts on one qubit, so the state stays a product","It is too weak","It always measures the qubit"],c:1,
+     e:"Applying U⊗I to a product state leaves a product state. Entangling needs a gate acting jointly on two qubits, such as CNOT."},
+    {q:"In the Bell state (|00⟩+|11⟩)/√2, what is the length of qubit A's Bloch vector?",
+     o:["1","0.707","0","It depends on how B is measured"],c:2,
+     e:"Zero. The pair is fully specified while each half is maximally mixed, which is exactly what has no classical counterpart. And it stays zero whatever B does, which is why no signal can be sent."},
+    {q:"In the H, phase, H circuit with φ = 180°, what do you measure?",
+     o:["0 always","1 always","50/50","Nothing, the state is invalid"],c:1,
+     e:"The two paths to outcome 0 cancel exactly, so P(0) = cos²(90°) = 0. This is destructive interference, and it is the mechanism behind every quantum speedup."},
+    {q:"What does Grover's algorithm do to an unstructured search over N items?",
+     o:["Solves it in constant time","Reduces N to log N","Reduces N to √N","Solves all NP-complete problems"],c:2,
+     e:"A quadratic speedup, and it is provably the best possible for unstructured search. It does not make exponential problems tractable."}
+  ];
+  var root=$("#quiz");
+  QS.forEach(function(item,i){
+    var d=document.createElement("div");
+    d.className="q-item"; d.dataset.c=item.c;
+    var opts=item.o.map(function(o,k){
+      return '<label><input type="radio" name="q'+i+'" value="'+k+'"><span>'+o+'</span></label>';
+    }).join("");
+    d.innerHTML='<p class="qt">'+(i+1)+". "+item.q+'</p><div class="opts">'+opts+'</div><p class="fb">'+item.e+'</p>';
+    root.appendChild(d);
+  });
+  $("#quizCheck").addEventListener("click",function(){
+    var score=0;
+    $$(".q-item",root).forEach(function(d){
+      var sel=d.querySelector("input:checked");
+      d.classList.add("checked");
+      d.classList.remove("right","wrong");
+      if(sel&&+sel.value===+d.dataset.c){score++;d.classList.add("right");}
+      else d.classList.add("wrong");
+    });
+    $("#quizScore").textContent="score: "+score+" / "+QS.length+(score===QS.length?"  ·  all correct":"  ·  reread the lessons behind the ones you missed");
+  });
+  $("#quizReset").addEventListener("click",function(){
+    $$(".q-item",root).forEach(function(d){
+      d.classList.remove("checked","right","wrong");
+      $$("input",d).forEach(function(i){i.checked=false;});
+    });
+    $("#quizScore").textContent="";
+  });
+})();
+
+/* ---------- lesson 0: unit circle ---------- */
+(function(){
+  var cv=$("#cvCircle"), ctx=cv.getContext("2d"), sl=$("#czSl"), w=0,h=0;
+  var obj={
+    resize:function(){
+      var r=cv.getBoundingClientRect(); if(!r.width)return;
+      var dp=Math.min(window.devicePixelRatio||1,2);
+      cv.width=Math.round(r.width*dp); cv.height=Math.round(r.height*dp);
+      ctx.setTransform(dp,0,0,dp,0,0); w=r.width; h=r.height; obj.draw();
+    },
+    draw:function(){
+      if(!w)return;
+      var C=colors(), R=Math.min(w,h)*0.36, ox=w/2, oy=h/2;
+      var th=rad(+sl.value);
+      ctx.clearRect(0,0,w,h);
+      ctx.lineWidth=1; ctx.strokeStyle=alpha(C.ink,0.3);
+      ctx.beginPath();ctx.moveTo(ox-R*1.25,oy);ctx.lineTo(ox+R*1.25,oy);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(ox,oy-R*1.25);ctx.lineTo(ox,oy+R*1.25);ctx.stroke();
+      ctx.beginPath();ctx.arc(ox,oy,R,0,TAU);ctx.strokeStyle=alpha(C.ink,0.24);ctx.stroke();
+      ctx.font="500 12px 'IBM Plex Mono', monospace"; ctx.fillStyle=alpha(C.ink,0.55);
+      ctx.textAlign="left"; ctx.textBaseline="top"; ctx.fillText("1",ox+R+4,oy+4);
+      ctx.fillText("i",ox+5,oy-R-16);
+      ctx.textAlign="right"; ctx.fillText("−1",ox-R-4,oy+4);
+      ctx.fillText("−i",ox-5,oy+R+4);
+      // angle arc
+      ctx.beginPath();ctx.arc(ox,oy,R*0.28,0,-th,true);ctx.strokeStyle=C.phase;ctx.lineWidth=1.4;ctx.stroke();
+      // z^2 (light)
+      var x2=ox+R*Math.cos(2*th), y2=oy-R*Math.sin(2*th);
+      ctx.setLineDash([2,4]);ctx.strokeStyle=alpha(C.one,0.6);ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(x2,y2,4.5,0,TAU);ctx.fillStyle=alpha(C.one,0.55);ctx.fill();
+      // z (dark)
+      var x=ox+R*Math.cos(th), y=oy-R*Math.sin(th);
+      ctx.strokeStyle=C.zero;ctx.lineWidth=2.4;ctx.lineCap="round";
+      ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(x,y);ctx.stroke();
+      ctx.setLineDash([2,4]);ctx.lineWidth=1;ctx.strokeStyle=alpha(C.ink,0.35);
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,oy);ctx.moveTo(x,y);ctx.lineTo(ox,y);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(x,y,5,0,TAU);ctx.fillStyle=C.zero;ctx.fill();
+      ctx.beginPath();ctx.arc(ox,oy,2.2,0,TAU);ctx.fillStyle=alpha(C.ink,0.5);ctx.fill();
+    }
+  };
+  function update(){
+    var t=+sl.value, th=rad(t);
+    $("#czOut").textContent=t+"°";
+    $("#czRe").textContent=fmt(Math.cos(th));
+    $("#czIm").textContent=fmt(Math.sin(th));
+    $("#czSq").textContent=((2*t)%360)+"°";
+    obj.draw();
+  }
+  sl.addEventListener("input",update);
+  spheres.push(obj); update();
+})();
+
+/* ---------- lesson 0: plane instruments ---------- */
+function flatCanvas(cv,drawFn){
+  var ctx=cv.getContext("2d"), st={w:0,h:0};
+  var obj={
+    resize:function(){
+      var r=cv.getBoundingClientRect(); if(!r.width)return;
+      var dp=Math.min(window.devicePixelRatio||1,2);
+      cv.width=Math.round(r.width*dp); cv.height=Math.round(r.height*dp);
+      ctx.setTransform(dp,0,0,dp,0,0); st.w=r.width; st.h=r.height; obj.draw();
+    },
+    draw:function(){ if(!st.w)return; ctx.clearRect(0,0,st.w,st.h); drawFn(ctx,st.w,st.h,colors()); }
+  };
+  spheres.push(obj); return obj;
+}
+function planeAxes(ctx,ox,oy,R,C,ext){
+  ctx.lineWidth=1; ctx.strokeStyle=alpha(C.ink,0.3);
+  ctx.beginPath();ctx.moveTo(ox-R*ext,oy);ctx.lineTo(ox+R*ext,oy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox,oy-R*ext);ctx.lineTo(ox,oy+R*ext);ctx.stroke();
+  ctx.beginPath();ctx.arc(ox,oy,R,0,TAU);ctx.strokeStyle=alpha(C.ink,0.22);ctx.stroke();
+  ctx.font="500 12px 'IBM Plex Mono', monospace"; ctx.fillStyle=alpha(C.ink,0.55);
+  ctx.textAlign="left"; ctx.textBaseline="top"; ctx.fillText("1",ox+R+3,oy+4);
+  ctx.textAlign="right"; ctx.fillText("−1",ox-R-3,oy+4);
+  ctx.textAlign="left"; ctx.textBaseline="bottom"; ctx.fillText("1",ox+5,oy-R-2);
+  ctx.textBaseline="top"; ctx.fillText("−1",ox+5,oy+R+2);
+}
+function arrow(ctx,x0,y0,x1,y1,col,lw,dash){
+  var dx=x1-x0, dy=y1-y0, L=Math.hypot(dx,dy); if(L<0.5)return;
+  ctx.save(); ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=lw; ctx.lineCap="round";
+  if(dash)ctx.setLineDash(dash);
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();ctx.setLineDash([]);
+  var hs=Math.min(9,L*0.5), ux=dx/L, uy=dy/L;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1-hs*ux+hs*0.5*uy,y1-hs*uy-hs*0.5*ux);ctx.lineTo(x1-hs*ux-hs*0.5*uy,y1-hs*uy+hs*0.5*ux);ctx.closePath();ctx.fill();
+  ctx.restore();
+}
+function tag(ctx,x,y,s,col){ctx.font="500 12px 'IBM Plex Mono', monospace";ctx.fillStyle=col;ctx.textAlign="left";ctx.textBaseline="bottom";ctx.fillText(s,x+6,y-6);}
+var f2=function(x){return (Math.abs(x)<5e-3?0:x).toFixed(2);};
+function cplx(a,b){return f2(a)+(b<0?" − ":" + ")+f2(Math.abs(b))+"i";}
+function vec2(x,y){return "["+f2(x)+", "+f2(y)+"]";}
+
+/* complex number as a point, draggable */
+(function(){
+  var cv=$("#cvCplx"), z=[2,1.5], LIM=2.4, R=0, ox=0, oy=0, drag=false;
+  function snap(x){return Math.max(-LIM,Math.min(LIM,Math.round(x*10)/10));}
+  var obj=flatCanvas(cv,function(ctx,w,h,C){
+    R=Math.min(w,h)*0.18; ox=w/2; oy=h/2;
+    planeAxes(ctx,ox,oy,R,C,2.6);
+    ctx.font="500 12px 'IBM Plex Mono', monospace"; ctx.fillStyle=alpha(C.ink,0.55);
+    ctx.textAlign="left"; ctx.textBaseline="top"; ctx.fillText("2",ox+2*R+3,oy+4);
+    ctx.textBaseline="bottom"; ctx.fillText("2i",ox+5,oy-2*R-2);
+    ctx.textAlign="right"; ctx.textBaseline="top"; ctx.fillText("real",ox+R*2.6,oy-16);
+    ctx.textAlign="left"; ctx.fillText("imaginary",ox+6,oy-R*2.6);
+    var x=ox+R*z[0], y=oy-R*z[1], yc=oy+R*z[1], th=Math.atan2(z[1],z[0]);
+    // drops to the axes
+    ctx.setLineDash([2,4]);ctx.lineWidth=1;ctx.strokeStyle=alpha(C.ink,0.45);
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,oy);ctx.moveTo(x,y);ctx.lineTo(ox,y);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=alpha(C.ink,0.7); ctx.textBaseline="middle";
+    if(Math.abs(z[1])>0.25){ctx.textAlign=z[0]>=0?"left":"right"; ctx.fillText("a",x+(z[0]>=0?6:-6),(y+oy)/2);}
+    if(Math.abs(z[0])>0.25){ctx.textAlign="center"; ctx.textBaseline=z[1]>=0?"bottom":"top"; ctx.fillText("b",(x+ox)/2,y+(z[1]>=0?-5:5));}
+    // angle
+    if(Math.hypot(z[0],z[1])>0.05){ctx.beginPath();ctx.arc(ox,oy,R*0.6,0,-th,th>0);ctx.strokeStyle=C.phase;ctx.lineWidth=1.4;ctx.stroke();}
+    // conjugate
+    arrow(ctx,ox,oy,x,yc,alpha(C.one,0.45),1.6,[3,4]); tag(ctx,x,yc,"z*",alpha(C.one,0.8));
+    ctx.beginPath();ctx.arc(x,yc,4,0,TAU);ctx.fillStyle=alpha(C.one,0.45);ctx.fill();
+    // z
+    arrow(ctx,ox,oy,x,y,C.zero,2.4); tag(ctx,x,y,"z",C.zero);
+    ctx.beginPath();ctx.arc(x,y,5,0,TAU);ctx.fillStyle=C.zero;ctx.fill();
+    ctx.beginPath();ctx.arc(x,y,9,0,TAU);ctx.strokeStyle=alpha(C.zero,0.45);ctx.lineWidth=1;ctx.stroke();
+  });
+  function update(){
+    var a=z[0], b=z[1], m=Math.hypot(a,b);
+    $("#cxA").textContent=f2(a); $("#cxB").textContent=f2(b);
+    $("#cxMod").textContent=f2(m); $("#cxMod2").textContent=f2(m*m);
+    $("#cxConj").textContent=cplx(a,-b);
+    var d=Math.atan2(b,a)*180/Math.PI; if(d<0)d+=360;
+    $("#cxTh").textContent=(m<0.05?"·":Math.round(d)+"°");
+    $("#cxNote").textContent="z·z* = a² + b² = "+f2(a*a)+" + "+f2(b*b)+" = "+f2(m*m)+", the same as |z|².";
+    obj.draw();
+  }
+  function local(e){var r=cv.getBoundingClientRect();return [(e.clientX-r.left-ox)/R,-(e.clientY-r.top-oy)/R];}
+  cv.addEventListener("pointerdown",function(e){var p=local(e);if(Math.hypot(p[0]-z[0],p[1]-z[1])>40/R)return;drag=true;cv.setPointerCapture(e.pointerId);e.preventDefault();});
+  cv.addEventListener("pointermove",function(e){if(!drag)return;var p=local(e);z=[snap(p[0]),snap(p[1])];update();});
+  function stop(e){drag=false;try{cv.releasePointerCapture(e.pointerId);}catch(err){}}
+  cv.addEventListener("pointerup",stop); cv.addEventListener("pointercancel",stop);
+  $$("#cvCplx").length&&$$("button[data-z]").forEach(function(b){b.addEventListener("click",function(){var p=b.dataset.z.split(",");z=[+p[0],+p[1]];update();});});
+  update();
+})();
+
+/* complex product */
+(function(){
+  var R1=$("#cpR1"),T1=$("#cpT1"),R2=$("#cpR2"),T2=$("#cpT2");
+  var obj=flatCanvas($("#cvProd"),function(ctx,w,h,C){
+    var R=Math.min(w,h)*0.22, ox=w/2, oy=h/2;
+    var r1=+R1.value/100, t1=rad(+T1.value), r2=+R2.value/100, t2=rad(+T2.value);
+    planeAxes(ctx,ox,oy,R,C,2.2);
+    function pt(r,t){return [ox+R*r*Math.cos(t), oy-R*r*Math.sin(t)];}
+    ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.arc(ox,oy,R*0.34,0,-t1,true);ctx.strokeStyle=C.zero;ctx.stroke();
+    ctx.beginPath();ctx.arc(ox,oy,R*0.5,0,-t2,true);ctx.strokeStyle=C.phase;ctx.stroke();
+    ctx.beginPath();ctx.arc(ox,oy,R*0.66,0,-((t1+t2)%TAU),true);ctx.strokeStyle=alpha(C.one,0.8);ctx.stroke();
+    var z=pt(r1,t1), wv=pt(r2,t2), p=pt(r1*r2,t1+t2);
+    arrow(ctx,ox,oy,z[0],z[1],C.zero,2.2); tag(ctx,z[0],z[1],"z",C.zero);
+    arrow(ctx,ox,oy,wv[0],wv[1],C.phase,2.2); tag(ctx,wv[0],wv[1],"w",C.phase);
+    arrow(ctx,ox,oy,p[0],p[1],C.one,2.8); tag(ctx,p[0],p[1],"z·w",C.one);
+    ctx.beginPath();ctx.arc(ox,oy,2.2,0,TAU);ctx.fillStyle=alpha(C.ink,0.5);ctx.fill();
+  });
+  function update(){
+    var r1=+R1.value/100, a1=+T1.value, r2=+R2.value/100, a2=+T2.value, t1=rad(a1), t2=rad(a2);
+    $("#cpR1o").textContent=f2(r1); $("#cpT1o").textContent=a1+"°";
+    $("#cpR2o").textContent=f2(r2); $("#cpT2o").textContent=a2+"°";
+    $("#cpZ").textContent=cplx(r1*Math.cos(t1),r1*Math.sin(t1));
+    $("#cpW").textContent=cplx(r2*Math.cos(t2),r2*Math.sin(t2));
+    $("#cpZW").textContent=cplx(r1*r2*Math.cos(t1+t2),r1*r2*Math.sin(t1+t2));
+    $("#cpMod").textContent=f2(r1*r2);
+    $("#cpAng").textContent=((a1+a2)%360)+"°";
+    obj.draw();
+  }
+  [R1,T1,R2,T2].forEach(function(s){s.addEventListener("input",update);});
+  update();
+})();
+
+/* inner product, draggable */
+(function(){
+  var cv=$("#cvInner"), u=[1,0.5], v=[0.4,1], LIM=1.4, R=0, ox=0, oy=0, drag=null;
+  function snap(x){return Math.max(-LIM,Math.min(LIM,Math.round(x*20)/20));}
+  var obj=flatCanvas(cv,function(ctx,w,h,C){
+    R=Math.min(w,h)*0.3; ox=w/2; oy=h/2;
+    planeAxes(ctx,ox,oy,R,C,1.55);
+    var dot=u[0]*v[0]+u[1]*v[1], nu2=u[0]*u[0]+u[1]*u[1];
+    var ux=ox+R*u[0], uy=oy-R*u[1], vx=ox+R*v[0], vy=oy-R*v[1];
+    if(nu2>1e-9){
+      var k=dot/nu2, px=ox+R*k*u[0], py=oy-R*k*u[1];
+      ctx.setLineDash([2,4]);ctx.lineWidth=1;ctx.strokeStyle=alpha(C.ink,0.4);
+      ctx.beginPath();ctx.moveTo(vx,vy);ctx.lineTo(px,py);ctx.stroke();ctx.setLineDash([]);
+      ctx.strokeStyle=C.phase;ctx.lineWidth=5;ctx.lineCap="butt";
+      ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(px,py);ctx.stroke();
+      if(Math.abs(dot)<1e-3){
+        var s=10, ex=u[0]/Math.sqrt(nu2), ey=u[1]/Math.sqrt(nu2), fx=v[0], fy=v[1], nv=Math.hypot(fx,fy);
+        if(nv>1e-9){fx/=nv;fy/=nv;
+          ctx.strokeStyle=C.ok;ctx.lineWidth=1.4;
+          ctx.beginPath();ctx.moveTo(ox+s*ex,oy-s*ey);ctx.lineTo(ox+s*(ex+fx),oy-s*(ey+fy));ctx.lineTo(ox+s*fx,oy-s*fy);ctx.stroke();}
+      }
+    }
+    arrow(ctx,ox,oy,ux,uy,C.zero,2.4); tag(ctx,ux,uy,"u",C.zero);
+    arrow(ctx,ox,oy,vx,vy,C.one,2.4); tag(ctx,vx,vy,"v",C.one);
+    ctx.beginPath();ctx.arc(ux,uy,7,0,TAU);ctx.strokeStyle=alpha(C.zero,0.5);ctx.lineWidth=1;ctx.stroke();
+    ctx.beginPath();ctx.arc(vx,vy,7,0,TAU);ctx.strokeStyle=alpha(C.one,0.5);ctx.stroke();
+  });
+  function update(){
+    var dot=u[0]*v[0]+u[1]*v[1], nu=Math.hypot(u[0],u[1]), nv=Math.hypot(v[0],v[1]);
+    $("#ipU").textContent=vec2(u[0],u[1]); $("#ipV").textContent=vec2(v[0],v[1]);
+    $("#ipDot").textContent=f2(dot); $("#ipNu").textContent=f2(nu); $("#ipNv").textContent=f2(nv);
+    var ang=(nu>1e-9&&nv>1e-9)?Math.acos(Math.max(-1,Math.min(1,dot/(nu*nv)))):NaN;
+    $("#ipAng").textContent=isNaN(ang)?"·":Math.round(ang*180/Math.PI)+"°";
+    var st=$("#ipStatus");
+    if(Math.abs(dot)<1e-3&&nu>1e-9&&nv>1e-9){st.textContent="⟨u, v⟩ = 0. Orthogonal: a measurement could tell these two apart every time.";st.style.color="var(--ok)";}
+    else if(Math.abs(Math.abs(dot)-nu*nv)<1e-3&&nu>1e-9){st.textContent="v is a multiple of u. Same direction, nothing to tell apart.";st.style.color="var(--muted)";}
+    else{st.textContent="Not orthogonal. Bring the shadow to zero to make ⟨u, v⟩ vanish.";st.style.color="var(--muted)";}
+    obj.draw();
+  }
+  function local(e){var r=cv.getBoundingClientRect();return [(e.clientX-r.left-ox)/R,-(e.clientY-r.top-oy)/R];}
+  cv.addEventListener("pointerdown",function(e){
+    var p=local(e), du=Math.hypot(p[0]-u[0],p[1]-u[1]), dv=Math.hypot(p[0]-v[0],p[1]-v[1]), lim=30/R;
+    if(Math.min(du,dv)>lim)return;
+    drag=du<=dv?u:v; cv.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  cv.addEventListener("pointermove",function(e){if(!drag)return;var p=local(e);drag[0]=snap(p[0]);drag[1]=snap(p[1]);update();});
+  function stop(e){drag=null;try{cv.releasePointerCapture(e.pointerId);}catch(err){}}
+  cv.addEventListener("pointerup",stop); cv.addEventListener("pointercancel",stop);
+  $("#ipPerp").addEventListener("click",function(){var nv=Math.hypot(v[0],v[1])||1,nu=Math.hypot(u[0],u[1])||1;v=[snap(-u[1]/nu*nv),snap(u[0]/nu*nv)];update();});
+  $("#ipAlign").addEventListener("click",function(){var nv=Math.hypot(v[0],v[1])||1,nu=Math.hypot(u[0],u[1])||1;v=[snap(u[0]/nu*nv),snap(u[1]/nu*nv)];update();});
+  $("#ipReset").addEventListener("click",function(){u=[1,0.5];v=[0.4,1];update();});
+  update();
+})();
+
+/* matrix action */
+(function(){
+  var th=$("#mxTh"), btns=$$("#mxBtns button"), cur="H";
+  function M(){
+    var t=rad(+th.value), c=Math.cos(t), s=Math.sin(t);
+    return {I:[[1,0],[0,1]],X:[[0,1],[1,0]],Z:[[1,0],[0,-1]],H:[[SQ,SQ],[SQ,-SQ]],R:[[c,-s],[s,c]],S:[[1,1],[0,1]]}[cur];
+  }
+  function ap(m,x,y){return [m[0][0]*x+m[0][1]*y, m[1][0]*x+m[1][1]*y];}
+  var obj=flatCanvas($("#cvMat"),function(ctx,w,h,C){
+    var R=Math.min(w,h)*0.3, ox=w/2, oy=h/2, m=M();
+    planeAxes(ctx,ox,oy,R,C,1.55);
+    ctx.setLineDash([3,4]);ctx.lineWidth=1.4;ctx.strokeStyle=alpha(C.ink,0.7);ctx.beginPath();
+    for(var i=0;i<=96;i++){var a=TAU*i/96,q=ap(m,Math.cos(a),Math.sin(a)),X=ox+R*q[0],Y=oy-R*q[1];if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y);}
+    ctx.stroke();ctx.setLineDash([]);
+    arrow(ctx,ox,oy,ox+R,oy,alpha(C.zero,0.3),1.6); arrow(ctx,ox,oy,ox,oy-R,alpha(C.one,0.3),1.6);
+    var e1=ap(m,1,0), e2=ap(m,0,1);
+    arrow(ctx,ox,oy,ox+R*e1[0],oy-R*e1[1],C.zero,2.6); tag(ctx,ox+R*e1[0],oy-R*e1[1],"M e₁",C.zero);
+    arrow(ctx,ox,oy,ox+R*e2[0],oy-R*e2[1],C.one,2.6); tag(ctx,ox+R*e2[0],oy-R*e2[1],"M e₂",C.one);
+  });
+  function update(){
+    var m=M(), a=m[0][0],b=m[0][1],c=m[1][0],d=m[1][1];
+    var mm=[[a*a+c*c,a*b+c*d],[a*b+c*d,b*b+d*d]];
+    var uni=Math.abs(mm[0][0]-1)<1e-6&&Math.abs(mm[1][1]-1)<1e-6&&Math.abs(mm[0][1])<1e-6;
+    $("#mxTho").textContent=th.value+"°";
+    $("#mxM").textContent="["+f2(a)+" "+f2(b)+"; "+f2(c)+" "+f2(d)+"]";
+    $("#mxMM").textContent="["+f2(mm[0][0])+" "+f2(mm[0][1])+"; "+f2(mm[1][0])+" "+f2(mm[1][1])+"]";
+    $("#mxLen").textContent=f2(Math.hypot(a,c))+", "+f2(Math.hypot(b,d));
+    var u=$("#mxUni"); u.textContent=uni?"yes, MᵀM = I":"no, MᵀM ≠ I"; u.style.color=uni?"var(--ok)":"var(--bad)";
+    btns.forEach(function(x){x.setAttribute("aria-pressed",x.dataset.m===cur?"true":"false");});
+    obj.draw();
+  }
+  btns.forEach(function(x){x.addEventListener("click",function(){cur=x.dataset.m;update();});});
+  th.addEventListener("input",function(){cur="R";update();});
+  update();
+})();
+
+/* tensor product bars */
+(function(){
+  var A=$("#tpA"), B=$("#tpB");
+  function update(){
+    var al=rad(+A.value), be=rad(+B.value), a=[Math.cos(al),Math.sin(al)], b=[Math.cos(be),Math.sin(be)];
+    $("#tpAo").textContent=A.value+"°"; $("#tpBo").textContent=B.value+"°";
+    $("#tpAv").textContent=vec2(a[0],a[1]); $("#tpBv").textContent=vec2(b[0],b[1]);
+    var out=[a[0]*b[0],a[0]*b[1],a[1]*b[0],a[1]*b[1]], sq=0;
+    out.forEach(function(x,i){
+      sq+=x*x;
+      var f=$("#tp"+i); f.style.width=(Math.abs(x)*100)+"%"; f.classList.toggle("o",x<-5e-3);
+      $("#tp"+i+"v").textContent=(x<-5e-3?"−":"")+f2(Math.abs(x));
+    });
+    $("#tpSum").textContent=fmt(sq);
+  }
+  A.addEventListener("input",update); B.addEventListener("input",update); update();
+})();
+
+/* worked examples: reveal one step at a time */
+$$(".worked").forEach(function(box){
+  var h=box.querySelector("h4"), li=$$("ol > li",box);
+  if(!h||h.textContent.indexOf("Worked example")!==0||li.length<2)return;
+  var b=document.createElement("button"); b.type="button"; b.className="b next";
+  var i=1;
+  function label(){b.textContent="next step ("+(i+1)+" of "+li.length+")";}
+  for(var k=1;k<li.length;k++)li[k].classList.add("hid");
+  label();
+  b.addEventListener("click",function(){
+    li[i].classList.remove("hid"); i++;
+    if(i>=li.length)b.remove(); else label();
+  });
+  box.appendChild(b);
+});
+
+/* ---------- lesson 10: notebook tools ---------- */
+(function(){
+  $$(".cell .copy").forEach(function(b){
+    b.addEventListener("click",function(){
+      var code=b.parentNode.querySelector("code").textContent;
+      var done=function(){b.textContent="copied";setTimeout(function(){b.textContent="copy";},1200);};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,done);
+      else{var ta=document.createElement("textarea");ta.value=code;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);done();}
+    });
+  });
+  var dl=$("#nbDownload"), dlWrap=dl.parentNode, dlLabel=dl.textContent;
+  dl.disabled=true;
+  var cap=(window.claude&&typeof window.claude.use==="function")?window.claude.use("downloads"):Promise.resolve({save:function(o){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([o.data],{type:"application/json"}));a.download=o.filename.replace(/\.json$/,".ipynb");document.body.appendChild(a);a.click();document.body.removeChild(a);return Promise.resolve();}});
+  cap.then(function(d){
+    if(!d){dlWrap.style.display="none";return;}
+    dl.disabled=false;
+    dl.addEventListener("click",function(){
+      var cells=[{cell_type:"markdown",metadata:{},source:["# Quantum Computing Workbook, lesson 10\n","\n","Circuits, and the same thing in Qiskit. Outputs in the workbook came from Qiskit 2.5.2 and qiskit-aer 0.17.2."]}];
+      $$("#l10 .cell").forEach(function(c){
+        var src=c.querySelector("code").textContent;
+        if(c.dataset.shell)src="!"+src;
+        var out=[], res=c.querySelector(".res pre");
+        if(res&&!res.classList.contains("note"))out.push({output_type:"stream",name:"stdout",text:res.textContent.split("\n").map(function(l,i,a){return i<a.length-1?l+"\n":l;})});
+        cells.push({cell_type:"code",execution_count:null,metadata:{},outputs:out,source:src.split("\n").map(function(l,i,a){return i<a.length-1?l+"\n":l;})});
+      });
+      var nb={cells:cells,metadata:{kernelspec:{display_name:"Python 3",language:"python",name:"python3"},language_info:{name:"python"}},nbformat:4,nbformat_minor:5};
+      dl.disabled=true; dl.textContent="saving";
+      d.save({filename:"quantum-workbook-lesson-10.json",data:JSON.stringify(nb,null,1)})
+        .then(function(){dl.textContent="saved";},function(e){dl.textContent=(e&&e.code==="declined")?"cancelled":"could not save";})
+        .then(function(){setTimeout(function(){dl.textContent=dlLabel;dl.disabled=false;},1500);});
+    });
+  },function(){dlWrap.style.display="none";});
+})();
+
+/* ---------- contents, progress, theme ---------- */
+var lessons=$$("section.lesson");
+(function(){
+  var ol=$("#toc");
+  lessons.forEach(function(s,i){
+    var li=document.createElement("li");
+    li.innerHTML='<a href="#'+s.id+'" data-for="'+s.id+'"><span class="n"><span>'+s.querySelector(".lnum").textContent+'</span></span><span>'+s.dataset.title+'</span></a>';
+    ol.appendChild(li);
+  });
+})();
+var links=$$("#toc a");
+
+function store(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+
+lessons.forEach(function(s,i){
+  var box=s.querySelector('.doneline input');
+  if(!box)return;
+  var key="qcw-done-"+s.id;
+  if(load(key)==="1"){box.checked=true;links[i].classList.add("done");}
+  box.addEventListener("change",function(){
+    store(key,box.checked?"1":"0");
+    links[i].classList.toggle("done",box.checked);
+  });
+});
+$("#resetBtn").addEventListener("click",function(){
+  lessons.forEach(function(s,i){
+    var box=s.querySelector('.doneline input');
+    if(box){box.checked=false;links[i].classList.remove("done");}
+    store("qcw-done-"+s.id,"0");
+  });
+});
+
+if("IntersectionObserver" in window){
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting)return;
+      var id=en.target.id;
+      links.forEach(function(a){a.classList.toggle("here",a.dataset.for===id);});
+    });
+  },{rootMargin:"-20% 0px -70% 0px"});
+  lessons.forEach(function(s){io.observe(s);});
+}
+
+$("#themeBtn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme",dark?"light":"dark");
+  spheres.forEach(function(s){s.draw();});
+});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){
+  spheres.forEach(function(s){s.draw();});
+});
+
+function resizeAll(){spheres.forEach(function(s){s.resize();});}
+window.addEventListener("resize",resizeAll);
+resizeAll();
+setTimeout(resizeAll,80);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(resizeAll);
+})();
+</script>
+</body>
+</html>
