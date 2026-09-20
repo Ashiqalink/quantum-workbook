@@ -208,6 +208,14 @@ button.b:disabled{opacity:.5;cursor:default}
 .tape .e{color:var(--muted)}
 .circuit{font-family:"IBM Plex Mono",monospace;font-size:15px;line-height:1.7;white-space:pre;overflow-x:auto;background:var(--paper);border:1px solid var(--rule);padding:12px}
 
+.tpgrid{width:auto;margin:0 0 14px;font-family:"IBM Plex Mono",monospace;font-size:15px}
+.tpgrid th,.tpgrid td{padding:8px 14px;border-bottom:1px solid var(--rule);text-align:center;white-space:nowrap}
+.tpgrid thead th{color:var(--muted);font-weight:500;font-family:"IBM Plex Mono",monospace;font-size:14px;border-bottom:1px solid var(--ink)}
+.tpgrid tbody th{color:var(--muted);font-weight:500;text-align:right;border-right:1px solid var(--ink)}
+.tpgrid td{font-variant-numeric:tabular-nums}
+.tpgrid td .p{display:block;font-size:12.5px;color:var(--muted)}
+.tpgrid td.neg{color:var(--one)}
+.tpgrid td.zero{color:var(--muted)}
 .tasks{list-style:none;padding:0;margin:0}
 .tasks li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;font-size:16.5px;margin-bottom:9px;color:var(--ink-2)}
 .tasks li .mk{font-family:"IBM Plex Mono",monospace;color:var(--muted);font-size:15px}
@@ -531,10 +539,20 @@ e^{iα} · e^{iβ} = e^{i(α+β)}           multiplying adds angles</div>
             <div class="fbody">
               <div class="two">
                 <div>
-                  <p class="lbl">a = [cos α, sin α]ᵀ</p>
-                  <div class="rowline"><label for="tpA">α</label><input type="range" id="tpA" min="0" max="359" value="30" step="1"><output id="tpAo">30°</output></div>
-                  <p class="lbl">b = [cos β, sin β]ᵀ</p>
-                  <div class="rowline"><label for="tpB">β</label><input type="range" id="tpB" min="0" max="359" value="60" step="1"><output id="tpBo">60°</output></div>
+                  <p class="lbl">pick a</p>
+                  <div class="btns" id="tpAbtns">
+                    <button class="b" type="button" data-v="1,0" aria-pressed="true">|0⟩ = [1, 0]</button>
+                    <button class="b" type="button" data-v="0,1">|1⟩ = [0, 1]</button>
+                    <button class="b" type="button" data-v="0.707,0.707">|+⟩ = [.71, .71]</button>
+                    <button class="b" type="button" data-v="0.707,-0.707">|−⟩ = [.71, −.71]</button>
+                  </div>
+                  <p class="lbl">pick b</p>
+                  <div class="btns" id="tpBbtns">
+                    <button class="b" type="button" data-v="1,0">|0⟩ = [1, 0]</button>
+                    <button class="b" type="button" data-v="0,1">|1⟩ = [0, 1]</button>
+                    <button class="b" type="button" data-v="0.707,0.707" aria-pressed="true">|+⟩ = [.71, .71]</button>
+                    <button class="b" type="button" data-v="0.707,-0.707">|−⟩ = [.71, −.71]</button>
+                  </div>
                   <div class="vals">
                     <div><div class="t">a</div><div class="v" id="tpAv"></div></div>
                     <div><div class="t">b</div><div class="v" id="tpBv"></div></div>
@@ -542,13 +560,17 @@ e^{iα} · e^{iβ} = e^{i(α+β)}           multiplying adds angles</div>
                   </div>
                 </div>
                 <div>
-                  <p class="lbl">a ⊗ b, four entries</p>
-                  <div class="bar"><span>a₁b₁</span><div class="track"><div class="fill" id="tp0"></div></div><span class="n" id="tp0v"></span></div>
-                  <div class="bar"><span>a₁b₂</span><div class="track"><div class="fill" id="tp1"></div></div><span class="n" id="tp1v"></span></div>
-                  <div class="bar"><span>a₂b₁</span><div class="track"><div class="fill" id="tp2"></div></div><span class="n" id="tp2v"></span></div>
-                  <div class="bar"><span>a₂b₂</span><div class="track"><div class="fill" id="tp3"></div></div><span class="n" id="tp3v"></span></div>
-                  <ul class="legend"><li><span class="sw zero"></span>positive entry</li><li><span class="sw one"></span>negative entry</li></ul>
-                  <p class="small" style="margin-top:12px">Bar length is the size of the entry. Two entries in, two entries in, four entries out.</p>
+                  <p class="lbl">every entry of a × every entry of b</p>
+                  <table class="tpgrid">
+                    <thead><tr><th></th><th>b₁ = <span id="tpb1"></span></th><th>b₂ = <span id="tpb2"></span></th></tr></thead>
+                    <tbody>
+                      <tr><th>a₁ = <span id="tpa1"></span></th><td id="tpc0"></td><td id="tpc1"></td></tr>
+                      <tr><th>a₂ = <span id="tpa2"></span></th><td id="tpc2"></td><td id="tpc3"></td></tr>
+                    </tbody>
+                  </table>
+                  <p class="lbl">read the grid row by row: that is the column a ⊗ b</p>
+                  <div class="eq" id="tpCol"></div>
+                  <p class="small">Four slots, one per pair of basis states: <code>|00⟩ |01⟩ |10⟩ |11⟩</code>. Lesson 7 uses exactly this column.</p>
                 </div>
               </div>
             </div>
@@ -2263,22 +2285,35 @@ function vec2(x,y){return "["+f2(x)+", "+f2(y)+"]";}
   update();
 })();
 
-/* tensor product bars */
+/* tensor product grid */
 (function(){
-  var A=$("#tpA"), B=$("#tpB");
+  var a=[1,0], b=[0.707,0.707];
+  var sg=function(x){return (x<-5e-3?"−":"")+f2(Math.abs(x));};
   function update(){
-    var al=rad(+A.value), be=rad(+B.value), a=[Math.cos(al),Math.sin(al)], b=[Math.cos(be),Math.sin(be)];
-    $("#tpAo").textContent=A.value+"°"; $("#tpBo").textContent=B.value+"°";
     $("#tpAv").textContent=vec2(a[0],a[1]); $("#tpBv").textContent=vec2(b[0],b[1]);
-    var out=[a[0]*b[0],a[0]*b[1],a[1]*b[0],a[1]*b[1]], sq=0;
+    $("#tpa1").textContent=sg(a[0]); $("#tpa2").textContent=sg(a[1]);
+    $("#tpb1").textContent=sg(b[0]); $("#tpb2").textContent=sg(b[1]);
+    var out=[a[0]*b[0],a[0]*b[1],a[1]*b[0],a[1]*b[1]], sq=0, fac=[[0,0],[0,1],[1,0],[1,1]];
     out.forEach(function(x,i){
       sq+=x*x;
-      var f=$("#tp"+i); f.style.width=(Math.abs(x)*100)+"%"; f.classList.toggle("o",x<-5e-3);
-      $("#tp"+i+"v").textContent=(x<-5e-3?"−":"")+f2(Math.abs(x));
+      var c=$("#tpc"+i);
+      c.innerHTML='<span class="p">'+sg(a[fac[i][0]])+" × "+sg(b[fac[i][1]])+"</span>"+sg(x);
+      c.className=x<-5e-3?"neg":(Math.abs(x)<5e-3?"zero":"");
     });
     $("#tpSum").textContent=fmt(sq);
+    var names=["a₁b₁","a₁b₂","a₂b₁","a₂b₂"], kets=["|00⟩","|01⟩","|10⟩","|11⟩"];
+    $("#tpCol").textContent=out.map(function(x,i){return "["+sg(x).padStart(6)+"]   "+names[i]+"   "+kets[i];}).join("\n");
   }
-  A.addEventListener("input",update); B.addEventListener("input",update); update();
+  function wire(id,set){
+    var bs=$$("#"+id+" button");
+    bs.forEach(function(btn){btn.addEventListener("click",function(){
+      bs.forEach(function(o){o.setAttribute("aria-pressed","false");});
+      btn.setAttribute("aria-pressed","true");
+      var v=btn.dataset.v.split(",").map(Number); set(v); update();
+    });});
+  }
+  wire("tpAbtns",function(v){a=v;}); wire("tpBbtns",function(v){b=v;});
+  update();
 })();
 
 /* worked examples: reveal one step at a time */
